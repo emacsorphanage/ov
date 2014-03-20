@@ -8,7 +8,7 @@ Simple way to manipulate overlay for Emacs.
 
 * [ov](#ov-beg-end-rest-properties) `(beg end &rest properties)`
 * [ov-make](#ov-make-beg-end) `(beg end)`
-* [ov-line](#ov-line-optional) `(&optional point)`
+* [ov-line](#ov-line-optional-point) `(&optional point)`
 * [ov-match](#ov-match-string-optional-beg-end) `(string &optional beg end)`
 * [ov-regexp](#ov-regexp-regexp-optional-beg-end) `(regexp &optional beg end)`
 * [ov-set](#ov-set-ov-or-ovs-rest-properties) `(ov-or-ovs &rest properties)`
@@ -41,9 +41,9 @@ Simple way to manipulate overlay for Emacs.
 
 * [ov-move](#ov-move-ov-beg-end-optional-buffer) `(ov beg end &optional buffer)`
 * [ov-timeout](#ov-timeout-time-func-func-after) `(time func func-after)`
-* [ov-next](#ov-next-optional-property-value) `(&optional point property value)`
-* [ov-prev](#ov-prev-optional-property-value) `(&optional point property value)`
-* [ov-read-only](#ov-read-only) `(ov-or-ovs)`
+* [ov-next](#ov-next-optional-point-property-value) `(&optional point property value)`
+* [ov-prev](#ov-prev-optional-point-property-value) `(&optional point property value)`
+* [ov-read-only](#ov-read-only-ov-or-ovs) `(ov-or-ovs)`
 
 
 ## Make overlay / Set properties
