@@ -48,7 +48,7 @@ Simple way to manipulate overlay for Emacs.
 
 ## Make overlay / Set properties
 
-#### ov        `(beg end &rest properties)`
+#### ov `(beg end &rest properties)`
 
 Make an overlay from `beg` and `end`, then set `properties`.
 
@@ -61,7 +61,7 @@ Return: overlay
 (ov (point-min) (point-max) '(face (:background "#00ff00" :height 1.5)))
 ```
 
-#### ov-make   `(beg end)`
+#### ov-make `(beg end)`
 
 Just make an overlay from `beg` and `end`.
 
@@ -73,7 +73,7 @@ Alias: `ov-create`
 (setq ov2 (ov-make (point-min) 25))  ; => #<overlay from 1 to 25 in *scratch*>
 ```
 
-#### ov-line   `(&optional point)`
+#### ov-line `(&optional point)`
 
 Make an overlay from the beginning of the line to the beginning of the next line, which include `point`.
 
@@ -83,7 +83,7 @@ Return: overlay
 (setq ov1 (ov-line))  ; => #<overlay from 734 to 827 in *scratch*>
 ```
 
-#### ov-match  `(string &optional beg end)`
+#### ov-match `(string &optional beg end)`
 
 Make overlays that match the `string`. `beg` and `end` are specify the area.
 
@@ -105,7 +105,7 @@ Return: overlay list
 (setq ov2 (ov-regexp "setq" 100 550))
 ```
 
-#### ov-set    `(ov-or-ovs &rest properties)`
+#### ov-set `(ov-or-ovs &rest properties)`
 
 Set properties and values in an overlay or overlays alternately.
 
@@ -137,7 +137,7 @@ Return: overlay
 
 ## Clear overlay
 
-#### ov-clear  `(&optional beg end property value)`
+#### ov-clear `(&optional beg end property value)`
 
 Clear `beg` and `end` of overlays whose `property` has `value`.  
 
@@ -149,7 +149,7 @@ Clear `beg` and `end` of overlays whose `property` has `value`.
 (ov-clear) ;; clear overlays in the whole buffer
 ```
 
-#### ov-reset  `(ov-or-ovs-variable)`
+#### ov-reset `(ov-or-ovs-variable)`
 
 Clear overlays in `ov-or-ovs-variable`. The variable is going to be nil.
 
@@ -166,7 +166,7 @@ Clear overlays in `ov-or-ovs-variable`. The variable is going to be nil.
 
 ## Look up overlay parameters, etc
 
-#### ov-p     `(ov)`
+#### ov-p `(ov)`
 
 Check whether `ov` is overlay or not.
 
@@ -181,7 +181,7 @@ Alias: `ov?`
 (ov-p ov3) ; => t
 ```
 
-#### ov-beg   `(ov)`
+#### ov-beg `(ov)`
 
 Get the beginning of an overlay.
 
@@ -192,7 +192,7 @@ Return: point
 (ov-beg ov1) ; => 200
 ```
 
-#### ov-end   `(ov)`
+#### ov-end `(ov)`
 
 Get the end of an overlay.
 
@@ -203,7 +203,7 @@ Return: point
 (ov-end ov1) ; => 700
 ```
 
-#### ov-buf   `(ov)`
+#### ov-buf `(ov)`
 
 Get the buffer object of an overlay.
 
@@ -215,7 +215,7 @@ Return: buffer object
 (buffer-name (ov-buf ov1)) ; => "*scratch*"
 ```
 
-#### ov-val   `(ov property)`
+#### ov-val `(ov property)`
 
 Get the value of `property` from an overlay.
 
@@ -228,7 +228,7 @@ Return: value
 (ov-val ov1 'aaa)           ; => "abc"
 ```
 
-#### ov-prop  `(ov)`
+#### ov-prop `(ov)`
 
 Get the properties from an overlay.
 
@@ -240,7 +240,7 @@ Return: properties list
 (ov-prop ov1) ; => (mouse-face (:underline t) face (:overline t))
 ```
 
-#### ov-spec  `(ov-or-ovs)`
+#### ov-spec `(ov-or-ovs)`
 
 Make a specification list from an overlay or overlay list.
 
@@ -258,7 +258,7 @@ Return: list ((beginning end buffer properties) (beginning end buffer properties
 
 ## Get an existing overlay or overlay list
 
-#### ov-at         `(&optional point)`
+#### ov-at `(&optional point)`
 
 Get an overlay from `point` or when the cursor is at an existing overlay.
 
@@ -271,7 +271,7 @@ Return: overlay or nil
   (ov-at))        ; => #<overlay from 20 to 50 in *scratch*>
 ```
 
-#### ov-in         `(beg end)`
+#### ov-in `(beg end)`
 
 Get overlays within from `beg` to `end`.
 
@@ -287,7 +287,7 @@ Return overlay list or nil
 (setq ov1 (ov-all))
 ```
 
-#### ov-backwards  `(&optional point)`
+#### ov-backwards `(&optional point)`
 
 Get overlays within from the beginning of the buffer to `point`.
 
@@ -298,7 +298,7 @@ Return: overlay list or nil
 (setq ov2 (ov-backwards 1200))
 ```
 
-#### ov-forwards   `(&optional point)`
+#### ov-forwards `(&optional point)`
 
 Get overlays within from the beginning of the buffer to `point`.
 
@@ -311,7 +311,7 @@ Return: overlay list or nil
 
 ## Overlay manipulation
 
-#### ov-move       `(ov beg end &optional buffer)`
+#### ov-move `(ov beg end &optional buffer)`
 
 Move an existing overlay position to other position.
 
@@ -329,7 +329,7 @@ Return: overlay
   (pop-to-buffer "test"))
 ```
 
-#### ov-timeout    `(time func func-after)`
+#### ov-timeout `(time func func-after)`
 
 Execute `func-after` after `time` seconds passed since `func` done.
 
@@ -345,7 +345,7 @@ Execute `func-after` after `time` seconds passed since `func` done.
 (ov-timeout 1.2 ov-fn1 ov-fn2)
 ```
 
-#### ov-next       `(&optional point property value)`
+#### ov-next `(&optional point property value)`
 
 Get the next existing overlay from `point`. You can also specify `property` and its `value`.
 
@@ -357,7 +357,7 @@ Get the next existing overlay from `point`. You can also specify `property` and 
 (goto-char (ov-end (ov-next nil 'bbb t)))
 ```
 
-#### ov-prev       `(&optional point property value)`
+#### ov-prev `(&optional point property value)`
 
 Get the previous existing overlay from `point`. You can also specify `property` and its `value`.
 
@@ -369,7 +369,7 @@ Get the previous existing overlay from `point`. You can also specify `property` 
 (goto-char (ov-end (ov-prev nil 'my-char 'o)))
 ```
 
-#### ov-read-only  `(ov-or-ovs)`
+#### ov-read-only `(ov-or-ovs)`
 
 It implements a read-only like feature for overlay. It's not as good as that of the text property.
 
