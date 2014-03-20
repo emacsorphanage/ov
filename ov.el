@@ -7,38 +7,71 @@
   "Group for ov.el"
   :prefix "ov-" :group 'development)
 
-(defmacro ov (beg end &rest properties)
-  (declare (indent 1))
-  `(let* ((prop (list ,@properties))
-          (length (length prop))
-          (pairs (/ length 2))
-          (ov (make-overlay ,beg ,end))
-          (i 0))
-     (unless (evenp length) (error "Error: invalid properties pairs"))
-     (while (< i pairs)
-       (overlay-put ov (pop prop) (pop prop))
-       (setq i (1+ i)))))
+;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html
+(defvar ov-prop-list '(priority
+                       window
+                       category
+                       face
+                       mouse-face
+                       display
+                       help-echo
+                       field
+                       modification-hooks
+                       insert-in-front-hooks
+                       insert-behind-hooks
+                       invisible
+                       intangible
+                       isearch-open-invisible
+                       isearch-open-invisible-temporary
+                       before-string
+                       after-string
+                       line-prefix
+                       wrap-prefix
+                       evaporate
+                       local-map
+                       keymap))
 
-;; (ov 3 20 'face 'helm-match 'aaa t)
-;; (ov 300 290 'face 'helm-match 'aaa nil)
-;; (ov 310 320 'face 'helm-match 'aaa t)
-;; (ov-clear-all 'aaa nil)
+
+(defun ov (beg end &rest properties)
+  ;; To pass properties to `ov-set'
+  (when (listp (car-safe properties))
+    (setq properties (car properties)))
+  (let ((o (make-overlay beg end)))
+    (ov-set o properties)
+    o))
+;; (ov 20 50 'face 'helm-match 'display "aaa")
+;; (ov 20 50 '(face helm-match display "ttt"))
+;; (ov-set (ov-line-at) 'face 'helm-match 'display "aaa")
+;; (ov-set (ov-line-at) '(face helm-match display "ttt"))
+
 
 ;;;###autoload
-(defun ov-clear-all (&optional property value)
-  (interactive)
-  (overlay-recenter (point-max))
-  (remove-overlays nil nil property value))
-
 (defun ov-clear (&optional beg end property value)
-  (let ((args (list beg end property value)))
+  (interactive)
+  (let ((args (cond ((and (numberp beg) (numberp end))
+                     (list beg end property value))
+                    ((and (not property) (not value))
+                     (list nil nil beg end)))))
     (overlay-recenter (point-max))
     (apply 'remove-overlays args)))
+;; (ov-clear (point) (point-max) 'aaa t)
+;; (ov-clear 'aaa t)                      ; Clear overlay if it has aaa property and its value t
+;; (ov-clear)                             ; Clear all overlay
+
+(defmacro ov-reset (ov-or-ovs-variable)
+  `(progn
+     (mapc (lambda (ov)
+             (delete-overlay ov))
+           (if (listp ,ov-or-ovs-variable)
+               ,ov-or-ovs-variable
+             (cons ,ov-or-ovs-variable nil)))
+     (setq ,ov-or-ovs-variable nil)))
 
 (defun ov-list ()
   (overlays-in (point-min) (point-max)))
 
 (defun ov-match (string)
+  "Return overlay list"
   (save-excursion
     (goto-char (point-min))
     (let (ov-or-ovs)
@@ -48,6 +81,7 @@
       ov-or-ovs)))
 
 (defun ov-regexp (regexp)
+  "Return overlay list"
   (save-excursion
     (goto-char (point-min))
     (let (ov-or-ovs)
@@ -56,31 +90,16 @@
         (setq ov-or-ovs (cons (make-overlay (match-beginning 0) (match-end 0)) ov-or-ovs)))
       ov-or-ovs)))
 
-(defun ov-map-set (ov-or-ovs properties)
-  (or (listp ov-or-ovs) (setq ov-or-ovs (cons ov-or-ovs nil)))
-  (unless (evenp (length properties))
-    (error "Error: invalid properties pairs"))
-  (mapc (lambda (ov)
-          (let ((props properties))
-            (while props
-              (overlay-put ov (pop props) (pop props)))))
-        ov-or-ovs)
-  nil)
-(defalias 'ov-map-put 'ov-map-set)
-
-(defmacro ov-map-clear (ov-or-ovs)
-  (or (listp ov-or-ovs) (setq ov-or-ovs (cons ov-or-ovs nil)))
-  `(progn
-     (mapc (lambda (ov)
-             (delete-overlay ov))
-           ,ov-or-ovs)
-     (if (symbolp ',ov-or-ovs)
-         (setq ,ov-or-ovs nil))))
-
 ;;(setq aaq (ov-regexp "def"))
 ;;(setq aaq (ov-match "def"))
-;;(ov-map-set aaq '(face helm-match aaa t))
-;;(ov-map-clear aaq)
+;;(ov-set aaq '(face helm-match aaa t))
+;;(ov-clear aaq)
+;;(ov-spec aaq)
+;;(ov-reset aaq)
+
+;;(setq bbq (ov-line-at))
+;;(ov-set bbq 'face 'helm-match)
+;;(ov-map-clear bbq)
 
 ;;(ov-clear-all)
 ;; (let ((o (ov-regexp "def")))
@@ -108,11 +127,8 @@
 ;;   (ov-clear-all 'aaa t))
 ;; (ov-timeout 0.5 fn1 fn2)
 
-(defun ov-spec (ov)
-  (list (overlay-start ov) (overlay-end ov)
-        (overlay-buffer ov) (overlay-properties ov)))
 
-(defun ov-map-spec (ov-or-ovs)
+(defun ov-spec (ov-or-ovs)
   (or (listp ov-or-ovs) (setq ov-or-ovs (cons ov-or-ovs nil)))
   (mapcar (lambda (ov)
             (list (overlay-start ov) (overlay-end ov)
@@ -120,6 +136,7 @@
           ov-or-ovs))
 
 (defalias 'ov-recenter 'overlay-recenter)
+(defalias 'ov-move 'move-overlay)
 
 (defun ov-create (beg end)
   (make-overlay beg end))
@@ -128,9 +145,27 @@
 (defun ov-props (ov)
   (overlay-properties ov))
 
-(defun ov-set (ov property value)
-  (overlay-put ov property value))
+(defun ov-set (ov-or-ovs &rest properties)
+  (unless (and ov-or-ovs properties)
+    (error "Error: arguments are OV and PROPERTIES"))
+  (or (listp ov-or-ovs) (setq ov-or-ovs (cons ov-or-ovs nil)))
+  (when (listp (car-safe properties))
+    (setq properties (car properties)))
+  (let ((len (length properties))
+        (i 0))
+    (unless (evenp len)
+      (error "Error: invalid properties pairs"))
+    (mapc (lambda (ov)
+            (while (< i len)
+              (overlay-put ov (nth i properties) (nth (setq i (1+ i)) properties))
+              (setq i (1+ i)))
+            (setq i 0))
+          ov-or-ovs)))
 (defalias 'ov-put 'ov-set)
+;; (ov-set (ov-line-at) '(face helm-match))
+;; (ov-set (ov-line-at) 'face 'helm-match)
+;; (ov-set (ov-line-at))
+
 
 (defun ov-value (ov property)
   (overlay-get ov property))
@@ -149,26 +184,15 @@
   (overlayp ov))
 (defalias 'ov? 'ov-p)
 
-
-(defun ov-line-at (&optional properties point)
+(defun ov-line-at (&optional point)
   (let (o)
     (save-excursion
       (goto-char (or point (point)))
-      (setq o (make-overlay (point-at-bol) (min (1+ (point-at-eol)) (point-max))))
-      (when properties
-        (ov-map-set o properties)))
+      (setq o (make-overlay (point-at-bol) (min (1+ (point-at-eol)) (point-max)))))
     o))
-;; (ov-line-at '(face helm-match))
-;; (ov-line-at '(face helm-match) 4000)
-;; (ov-timeout 0.6 '(ov-line-at '(face helm-match)) '(ov-clear-all))
 
-(setq ooo (ov-line-at))
-
-(ov-read-only ooo)
-
-
-
-
+;; (setq ooo (ov-line-at))
+;; (ov-read-only ooo)
 (defun ov-read-only (ov-or-ovs)
   (or (listp ov-or-ovs) (setq ov-or-ovs (cons ov-or-ovs nil)))
   (mapc (lambda (ov)
