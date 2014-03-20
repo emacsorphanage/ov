@@ -1,3 +1,29 @@
+;;; ov.el --- Overlay library for Emacs Lisp -*- coding: utf-8; lexical-binding: t -*-
+
+;; Copyright (C) 2014 by Shingo Fukuyama
+
+;; Version: 1.0
+;; Author: Shingo Fukuyama - http://fukuyama.co
+;; URL: https://github.com/ShingoFukuyama/ov.el
+;; Created: Mar 20 2014
+;; Keywords: overlay
+;; Package-Requires: ((emacs "24.3"))
+
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 2 of
+;; the License, or (at your option) any later version.
+
+;; This program is distributed in the hope that it will be
+;; useful, but WITHOUT ANY WARRANTY; without even the implied
+;; warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+;; PURPOSE.  See the GNU General Public License for more details.
+
+;;; Commentary:
+
+;; Simple way to manipulate overlay for Emacs.
+;; More information is in README.md or https://github.com/ShingoFukuyama/ov.el
+
 ;;; Code:
 
 (require 'cl-lib)
