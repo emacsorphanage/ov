@@ -318,7 +318,7 @@ Return: overlay list or nil
 
 #### ov-move `(ov beg end &optional buffer)`
 
-Move an existing overlay position to other position.
+Move an existing overlay position to another position.
 
 Return: overlay
 
@@ -382,7 +382,7 @@ It implements a read-only like feature for overlay. It's not as good as that of 
 (setq ov1 (ov-match "setq"))
 (ov-set ov1 'face 'success)
 (ov-read-only ov1)
-;; You will be able to prevent "setq"s from some deleting commands.
+;; You will be able to prevent some commands from modifying "setq" strings.
 ```
 
 ## Reference
