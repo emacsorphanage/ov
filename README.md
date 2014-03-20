@@ -384,3 +384,10 @@ It implements a read-only like feature for overlay. It's not as good as that of 
 (ov-read-only ov1)
 ;; You will be able to prevent "setq"s from some deleting commands.
 ```
+
+## Reference
+
+* [Overlay Properties](http://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html)
+* [Face Attributes](http://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html)
+* [Managing Overlays](http://www.gnu.org/software/emacs/manual/html_node/elisp/Managing-Overlays.html)
+* [comint read-only prompt](http://lists.gnu.org/archive/html/emacs-devel/2002-08/msg00428.html)
