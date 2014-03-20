@@ -2,6 +2,10 @@
 
 Simple way to manipulate overlay for Emacs.
 
+## Command
+
+You can always do `M-x ov-clear` to clear all overlays in the current buffer.
+
 ## Functions
 
 ### Make overlay / Set properties
@@ -45,7 +49,6 @@ Simple way to manipulate overlay for Emacs.
 * [ov-prev](#ov-prev-optional-point-property-value) `(&optional point property value)`
 * [ov-read-only](#ov-read-only-ov-or-ovs) `(ov-or-ovs)`
 
-
 ## Make overlay / Set properties
 
 #### ov `(beg end &rest properties)`
@@ -60,6 +63,8 @@ Return: overlay
 (ov (point-min) (point) 'face '(:background "#00ff00" :height 1.5))
 (ov (point-min) (point-max) '(face (:background "#00ff00" :height 1.5)))
 ```
+
+You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 
 #### ov-make `(beg end)`
 
