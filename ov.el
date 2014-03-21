@@ -58,6 +58,7 @@
 
 ;; Make overlay / Set properties -----------------------------------------------
 (defun ov (beg end &rest properties)
+  "Make an overlay from `beg' and `end', then set `properties'."
   ;; To pass properties to `ov-set'
   (when (listp (car-safe properties))
     (setq properties (car properties)))
@@ -65,12 +66,21 @@
     (ov-set o properties)
     o))
 
+;; Just make an overlay from `beg' and `end'.
 ;; Alias                             ;; Argument
 (defalias 'ov-create  'make-overlay) ;; (beg end)
 (defalias 'ov-make    'make-overlay) ;; (beg end)
 
+(defun ov-line (&optional point)
+  "Make an overlay from the beginning of the line to the beginning of the next line, which include `point`."
+  (let (o)
+    (save-excursion
+      (goto-char (or point (point)))
+      (setq o (ov-make (point-at-bol) (min (1+ (point-at-eol)) (point-max)))))
+    o))
+
 (defun ov-match (string &optional beg end)
-  "Return overlay list"
+  "Make overlays that match the `string'. `beg' and `end' are specify the area."
   (save-excursion
     (goto-char (or beg (point-min)))
     (let (ov-or-ovs)
@@ -81,7 +91,7 @@
       ov-or-ovs)))
 
 (defun ov-regexp (regexp &optional beg end)
-  "Return overlay list"
+  "Make overlays that match the `regexp'. `beg' and `end' are specify the area."
   (save-excursion
     (goto-char (or beg (point-min)))
     (let (ov-or-ovs)
@@ -91,14 +101,8 @@
                                             (match-end 0)) ov-or-ovs)))
       ov-or-ovs)))
 
-(defun ov-line (&optional point)
-  (let (o)
-    (save-excursion
-      (goto-char (or point (point)))
-      (setq o (ov-make (point-at-bol) (min (1+ (point-at-eol)) (point-max)))))
-    o))
-
 (defun ov-region ()
+  "Make an overlay from a region, when you make a region"
   (if mark-active
       (let ((o (ov-make (region-beginning) (region-end))))
         (deactivate-mark t)
@@ -106,6 +110,7 @@
     (error "Error: Need to make region")))
 
 (defun ov-set (ov-or-ovs &rest properties)
+  "Set properties and values in an overlay or overlays alternately."
   (unless (and ov-or-ovs properties)
     (error "Error: arguments are OV and PROPERTIES"))
   (or (listp ov-or-ovs) (setq ov-or-ovs (cons ov-or-ovs nil)))
@@ -128,6 +133,7 @@
 ;; Delete overlay --------------------------------------------------------------
 ;;;###autoload
 (defun ov-clear (&optional beg end property value)
+  "Clear `beg' and `end' of overlays whose `property' has `value'."
   (interactive)
   (let ((args (cond ((and (numberp beg) (numberp end))
                      (list beg end property value))
@@ -137,6 +143,7 @@
     (apply 'remove-overlays args)))
 
 (defmacro ov-reset (ov-or-ovs-variable)
+  "Clear overlays in `ov-or-ovs-variable'. The variable is going to be nil."
   `(progn
      (mapc (lambda (ov)
              (delete-overlay ov))
@@ -148,23 +155,20 @@
 
 ;; Look up overlay parameters, etc ---------------------------------------------
 ;; Alias                                ;; Argument
+;; Check whether `ov' is overlay or not.
 (defalias 'ov-p    'overlayp)           ;; (ov)
 (defalias 'ov?     'overlayp)           ;; (ov)
 (defalias 'ov-val  'overlay-get)        ;; (ov property)
-
-(defun ov-beg (ov)
-  (if (ov? ov) (overlay-start ov) nil))
-
-(defun ov-end (ov)
-  (if (ov? ov) (overlay-end ov) nil))
-
-(defun ov-buf (ov)
-  (if (ov? ov) (overlay-buffer ov) nil))
-
-(defun ov-prop (ov)
-  (if (ov? ov) (overlay-properties ov) nil))
+;; Get the boundary position of an overlay.
+(defalias 'ov-beg  'overlay-start)      ;; (ov)
+(defalias 'ov-end  'overlay-end)        ;; (ov)
+;; Get the buffer object of an overlay.
+(defalias 'ov-buf  'overlay-buffer)     ;; (ov)
+;; Get the properties from an overlay.
+(defalias 'ov-prop 'overlay-properties) ;; (ov)
 
 (defun ov-spec (ov-or-ovs)
+  "Make a specification list from an overlay or overlay list."
   (or (listp ov-or-ovs) (setq ov-or-ovs (cons ov-or-ovs nil)))
   (mapcar (lambda (ov)
             (list (ov-beg ov) (ov-end ov)
@@ -174,27 +178,34 @@
 
 ;; Get present overlay object --------------------------------------------------
 (defun ov-at (&optional point)
+  "Get an overlay from `point' or when the cursor is at an existing overlay."
   (or point (setq point (point)))
   (car (overlays-at point)))
 
+;; Get overlays within from `beg' to `end'.
 (defalias 'ov-in 'overlays-in)
 
 (defun ov-all ()
+  "Get overlays in the whole buffer."
   (ov-in (point-min) (point-max)))
 
 (defun ov-backwards (&optional point)
+  "Get overlays within from the beginning of the buffer to `point'."
   (ov-in (point-min) (or point (point))))
 
 (defun ov-forwards (&optional point)
+  "Get overlays within from the buffer to `point' to the end of the buffer."
   (ov-in (or point (point)) (point-max)))
 
 
 ;; Overlay manipulation --------------------------------------------------------
 ;; Alias                                  ;; Argument
 (defalias 'ov-recenter 'overlay-recenter) ;; (point)
+;; Move an existing overlay position to another position.
 (defalias 'ov-move     'move-overlay)     ;; (ov beg end &optional buffer)
 
 (defmacro ov-timeout (time func func-after)
+  "Execute `func-after' after `time' seconds passed since `func' done."
   (declare (indent 1))
   `(progn
     ,(if (symbolp func-after)
@@ -205,6 +216,7 @@
        (funcall `(lambda () ,func)))))
 
 (defun ov-next (&optional point property value)
+  "Get the next existing overlay from `point'. You can also specify `property' and its `value'."
   (or point (setq point (point)))
   (cond ((and (not property) (not value))
          (ov-at (next-overlay-change point)))
@@ -227,6 +239,7 @@
              ov)))))
 
 (defun ov-prev (&optional point property value)
+  "Get the previous existing overlay from `point'. You can also specify `property' and its `value'."
   (or point (setq point (point)))
   (cond ((and (not property) (not value))
          (ov-at (previous-overlay-change point)))
@@ -251,6 +264,7 @@
 
 ;; Impliment pseudo read-only overlay function ---------------------------------
 (defun ov-read-only (ov-or-ovs)
+  "It implements a read-only like feature for overlay. It's not as good as that of the text property."
   (or (listp ov-or-ovs) (setq ov-or-ovs (cons ov-or-ovs nil)))
   (mapc (lambda (ov)
           (overlay-put ov 'modification-hooks    '(ov--read-only))
@@ -259,7 +273,7 @@
 
 ;; http://lists.gnu.org/archive/html/emacs-devel/2002-08/msg00428.html
 (defvar ov-save-comint-last-prompt-overlay nil)
-(defun ov--read-only (overlay after start end &optional len)
+(defun ov--read-only (overlay after start end &optional _len)
   (if (and (not after)
            (or (< (ov-beg overlay) start)
                (> (ov-end overlay) end)))

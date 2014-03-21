@@ -55,7 +55,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 
 Make an overlay from `beg` and `end`, then set `properties`.
 
-Return: overlay
+Return: `overlay`
 
 ```cl
 (ov 10 40 'face 'font-lock-warning-face 'intangible t)
@@ -70,7 +70,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 
 Just make an overlay from `beg` and `end`.
 
-Return: overlay  
+Return: `overlay`
 Alias: `ov-create`
 
 ```cl
@@ -82,7 +82,7 @@ Alias: `ov-create`
 
 Make an overlay from the beginning of the line to the beginning of the next line, which include `point`.
 
-Return: overlay
+Return: `overlay`
 
 ```cl
 (setq ov1 (ov-line))  ; => #<overlay from 734 to 827 in *scratch*>
@@ -92,7 +92,7 @@ Return: overlay
 
 Make overlays that match the `string`. `beg` and `end` are specify the area.
 
-Return: overlay list
+Return: `overlay list`
 
 ```cl
 (setq ov1 (ov-match "setq"))
@@ -103,7 +103,7 @@ Return: overlay list
 
 Make overlays that match the `regexp`. `beg` and `end` are specify the area.
 
-Return: overlay list
+Return: `overlay list`
 
 ```cl
 (setq ov1 (ov-regexp "setq"))
@@ -114,6 +114,7 @@ Return: overlay list
 
 Set properties and values in an overlay or overlays alternately.
 
+Return: `nil`  
 Alias: `ov-put`
 
 ```cl
@@ -134,7 +135,7 @@ Alias: `ov-put`
 Make an overlay from a region.  
 When you make a region, do `M-: (ov-set (ov-region) 'face '(:box t))`.
 
-Return: overlay
+Return: `overlay`
 
 ```cl
 (ov-set (ov-region) 'face '(:box t))
@@ -144,8 +145,7 @@ Return: overlay
 
 #### ov-clear `(&optional beg end property value)`
 
-Clear `beg` and `end` of overlays whose `property` has `value`.  
-
+Clear `beg` and `end` of overlays whose `property` has `value`.
 
 ```cl
 (ov-clear 100 550 'my-fancy-comment t)
@@ -190,7 +190,7 @@ Alias: `ov?`
 
 Get the beginning of an overlay.
 
-Return: point
+Return: `point`
 
 ```cl
 (setq ov1 (ov-make 200 700))
@@ -201,7 +201,7 @@ Return: point
 
 Get the end of an overlay.
 
-Return: point
+Return: `point`
 
 ```cl
 (setq ov1 (ov-make 200 700))
@@ -212,7 +212,7 @@ Return: point
 
 Get the buffer object of an overlay.
 
-Return: buffer object
+Return: `buffer object`
 
 ```cl
 (setq ov1 (ov-make 200 700))
@@ -224,7 +224,7 @@ Return: buffer object
 
 Get the value of `property` from an overlay.
 
-Return: value
+Return: `value` of property
 
 ```cl
 (setq ov1 (ov-line))
@@ -237,7 +237,7 @@ Return: value
 
 Get the properties from an overlay.
 
-Return: properties list
+Return: `properties list`
 
 ```cl
 (setq ov1 (ov-make (point-min) (point-max)))
@@ -249,7 +249,7 @@ Return: properties list
 
 Make a specification list from an overlay or overlay list.
 
-Return: list ((beginning end buffer properties) (beginning end buffer properties)...) or nil
+Return: `list ((beginning end buffer properties) (beginning end buffer properties)...)` or `nil`
 
 ```cl
 (setq ov1 (ov-match "ov-spec"))
@@ -267,7 +267,7 @@ Return: list ((beginning end buffer properties) (beginning end buffer properties
 
 Get an overlay from `point` or when the cursor is at an existing overlay.
 
-Return: overlay or nil
+Return: `overlay` or `nil`
 
 ```cl
 (save-excursion
@@ -280,13 +280,13 @@ Return: overlay or nil
 
 Get overlays within from `beg` to `end`.
 
-Return: overlay list
+Return: `overlay list`
 
 #### ov-all
 
 Get overlays in the whole buffer.
 
-Return overlay list or nil
+Return: `overlay list` or `nil`
 
 ```cl
 (setq ov1 (ov-all))
@@ -296,7 +296,7 @@ Return overlay list or nil
 
 Get overlays within from the beginning of the buffer to `point`.
 
-Return: overlay list or nil
+Return: `overlay list` or `nil`
 
 ```cl
 (setq ov1 (ov-backwards))
@@ -305,9 +305,9 @@ Return: overlay list or nil
 
 #### ov-forwards `(&optional point)`
 
-Get overlays within from the beginning of the buffer to `point`.
+Get overlays within from the buffer to `point` to the end of the buffer.
 
-Return: overlay list or nil
+Return: `overlay list` or `nil`
 
 ```cl
 (setq ov1 (ov-forwards))
@@ -320,7 +320,7 @@ Return: overlay list or nil
 
 Move an existing overlay position to another position.
 
-Return: overlay
+Return: `overlay`
 
 ```cl
 (setq ov1 (ov-line))
