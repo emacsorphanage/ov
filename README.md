@@ -305,7 +305,7 @@ Return: `overlay list` or `nil`
 
 #### ov-forwards `(&optional point)`
 
-Get overlays within from the buffer to `point` to the end of the buffer.
+Get overlays within from `point` to the end of the buffer.
 
 Return: `overlay list` or `nil`
 
