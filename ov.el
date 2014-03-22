@@ -26,8 +26,6 @@
 
 ;;; Code:
 
-(require 'cl-lib)
-
 (defgroup ov nil
   "Group for ov.el"
   :prefix "ov-" :group 'development)
@@ -118,7 +116,7 @@
     (setq properties (car properties)))
   (let ((len (length properties))
         (i 0))
-    (unless (cl-evenp len)
+    (unless (eq (logand len 1) 0)
       (error "Error: invalid properties pairs"))
     (mapc (lambda (ov)
             (while (< i len)
