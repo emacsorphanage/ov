@@ -213,29 +213,35 @@
          (run-with-timer time nil `(lambda () (funcall ',func-after)))
        (run-with-timer time nil `(lambda () ,(funcall `(lambda () ,func-after)))))
     ,(if (symbolp func)
-         (funcall func)
+         (funcall `(lambda () (funcall ',func)))
        (funcall `(lambda () ,func)))))
 
 (defun ov-next (&optional point property value)
   "Get the next existing overlay from `point'. You can also specify `property' and its `value'."
   (or point (setq point (point)))
   (cond ((and (not property) (not value))
-         (ov-at (next-overlay-change point)))
+         (let* ((po (next-overlay-change point))
+                (ov (ov-at po)))
+           (if (ov? ov)
+               ov
+             (ov-at (next-overlay-change po)))))
         ((and property (not value))
          (save-excursion
            (goto-char (next-overlay-change point))
            (let (ov)
-             (while (and (not (memq property (ov-prop (setq ov (ov-at (point))))))
-                         (not (eobp)))
+             (while (and (not (if (setq ov (ov-at (point)))
+                                  (memq property (ov-prop ov))))
+                         (not (if (eobp) (progn (setq ov nil) t))))
                (goto-char (next-overlay-change (point))))
              ov)))
         (t
          (save-excursion
            (goto-char (next-overlay-change point))
            (let (ov)
-             (while (and (not (and (memq property (ov-prop (setq ov (ov-at (point)))))
-                                   (equal value (ov-val ov property))))
-                         (not (eobp)))
+             (while (and (not (if (setq ov (ov-at (point)))
+                                  (and (memq property (ov-prop ov))
+                                       (equal value (ov-val ov property)))))
+                         (not (if (eobp) (progn (setq ov nil) t))))
                (goto-char (next-overlay-change (point))))
              ov)))))
 
@@ -248,19 +254,19 @@
          (save-excursion
            (goto-char (previous-overlay-change point))
            (let (ov)
-             (while (or (not (setq ov (ov-at (1- (point)))))
-                        (and (not (memq property (ov-prop ov)))
-                             (not (bobp))))
+             (while (and (not (if (setq ov (ov-at (1- (point))))
+                                  (memq property (ov-prop ov))))
+                         (not (if (bobp) (progn (setq ov nil) t))))
                (goto-char (previous-overlay-change (point))))
              ov)))
         (t
          (save-excursion
            (goto-char (previous-overlay-change point))
            (let (ov)
-             (while (or (not (setq ov (ov-at (1- (point)))))
-                        (and (not (and (memq property (ov-prop (setq ov (ov-at (1- (point))))))
-                                       (equal value (ov-val ov property))))
-                             (not (bobp))))
+             (while (and (not (if (setq ov (ov-at (1- (point))))
+                                  (and (memq property (ov-prop ov))
+                                       (equal value (ov-val ov property)))))
+                         (not (if (bobp) (progn (setq ov nil) t))))
                (goto-char (previous-overlay-change (point))))
              ov)))))
 
