@@ -111,10 +111,11 @@
   "Set properties and values in an overlay or overlays alternately."
   (unless (and ov-or-ovs-or-regexp properties)
     (error "Error: arguments are OV and PROPERTIES"))
-  (cond ((listp ov-or-ovs-or-regexp)
-         (setq ov-or-ovs-or-regexp (cons ov-or-ovs-or-regexp nil)))
-        ((ov-regexp ov-or-ovs-or-regexp)
-         (setq ov-or-ovs-or-regexp (ov-regexp ov-or-ovs-or-regexp))))
+  (cond ((listp ov-or-ovs-or-regexp))
+        ((stringp ov-or-ovs-or-regexp)
+         (setq ov-or-ovs-or-regexp (ov-regexp ov-or-ovs-or-regexp)))
+        (t
+         (setq ov-or-ovs-or-regexp (cons ov-or-ovs-or-regexp nil))))
   (when (listp (car-safe properties))
     (setq properties (car properties)))
   (let ((len (length properties))
