@@ -107,11 +107,14 @@
         o)
     (error "Error: Need to make region")))
 
-(defun ov-set (ov-or-ovs &rest properties)
+(defun ov-set (ov-or-ovs-or-regexp &rest properties)
   "Set properties and values in an overlay or overlays alternately."
-  (unless (and ov-or-ovs properties)
+  (unless (and ov-or-ovs-or-regexp properties)
     (error "Error: arguments are OV and PROPERTIES"))
-  (or (listp ov-or-ovs) (setq ov-or-ovs (cons ov-or-ovs nil)))
+  (cond ((listp ov-or-ovs-or-regexp)
+         (setq ov-or-ovs-or-regexp (cons ov-or-ovs-or-regexp nil)))
+        ((ov-regexp ov-or-ovs-or-regexp)
+         (setq ov-or-ovs-or-regexp (ov-regexp ov-or-ovs-or-regexp))))
   (when (listp (car-safe properties))
     (setq properties (car properties)))
   (let ((len (length properties))
@@ -123,7 +126,7 @@
               (overlay-put ov (nth i properties) (nth (setq i (1+ i)) properties))
               (setq i (1+ i)))
             (setq i 0))
-          ov-or-ovs)
+          ov-or-ovs-or-regexp)
     nil))
 (defalias 'ov-put 'ov-set)
 

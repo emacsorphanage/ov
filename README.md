@@ -15,7 +15,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 * [ov-line](#ov-line-optional-point) `(&optional point)`
 * [ov-match](#ov-match-string-optional-beg-end) `(string &optional beg end)`
 * [ov-regexp](#ov-regexp-regexp-optional-beg-end) `(regexp &optional beg end)`
-* [ov-set](#ov-set-ov-or-ovs-rest-properties) `(ov-or-ovs &rest properties)`
+* [ov-set](#ov-set-ov-or-ovs-or-regexp-rest-properties) `(ov-or-ovs-or-regexp &rest properties)`
 * [ov-region](#ov-region)
 
 ### Clear overlay
@@ -110,9 +110,11 @@ Return: `overlay list`
 (setq ov2 (ov-regexp "setq" 100 550))
 ```
 
-#### ov-set `(ov-or-ovs &rest properties)`
+#### ov-set `(ov-or-ovs-or-regexp &rest properties)`
 
-Set properties and values in an overlay or overlays alternately.
+Set properties and values in an overlay or overlays alternately.  
+If `ov-or-ovs-or-regexp` is string, it use `ov-regexp` to make overlays.  
+If you want to use literal string, use `(ov-match "string")` instead.
 
 Return: `nil`  
 Alias: `ov-put`
@@ -125,6 +127,7 @@ Alias: `ov-put`
 (ov-set ov2 '(face font-lock-function-name-face intangible t))
 
 (ov-set (ov-regexp "^.ov-") 'display "λλ-" 'before-string "(" 'line-prefix "<λ>")
+(ov-set "^;;.+$" 'face 'warning)
 
 (ov-set (ov-line) 'before-string (propertize ">>> " 'face 'font-lock-warning-face))
 (ov-set (ov-line) `(before-string ,(propertize ">>> " 'face 'font-lock-warning-face)))
@@ -249,7 +252,7 @@ Return: `properties list`
 
 Make a specification list from an overlay or overlay list.
 
-Return: `list ((beginning end buffer properties) (beginning end buffer properties)...)` or `nil`
+Return: `list ((beginning end buffer (properties)) (beginning end buffer (properties))...)` or `nil`
 
 ```cl
 (setq ov1 (ov-match "ov-spec"))
@@ -340,7 +343,7 @@ Execute `func-after` after `time` seconds passed since `func` done.
 
 ```cl
 (ov-timeout 0.5
-  '(ov-set (ov-regexp "ov") '(face (:background "#ff0000") aaa t))
+  '(ov-set "ov" '(face (:background "#ff0000") aaa t))
   '(ov-clear 'aaa t))
 
 (defun ov-fn1 ()
@@ -355,8 +358,8 @@ Execute `func-after` after `time` seconds passed since `func` done.
 Get the next existing overlay from `point`. You can also specify `property` and its `value`.
 
 ```cl
-(ov-set (ov-regexp "^..") '(face (:background "#ff9900") aaa t))
-(ov-set (ov-regexp "..$") '(face (:background "#7700ff") bbb t))
+(ov-set "^.." '(face (:background "#ff9900") aaa t))
+(ov-set "..$" '(face (:background "#7700ff") bbb t))
 (ov-next)         ; => #<overlay from 436 to 438 in *scratch*>
 (goto-char (ov-beg (ov-next nil 'aaa)))
 (goto-char (ov-end (ov-next nil 'bbb t)))
