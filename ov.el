@@ -111,10 +111,9 @@
   "Set properties and values in an overlay or overlays alternately."
   (unless (and ov-or-ovs-or-regexp properties)
     (error "Error: arguments are OV and PROPERTIES"))
-  (cond ((listp ov-or-ovs-or-regexp))
-        ((stringp ov-or-ovs-or-regexp)
+  (cond ((stringp ov-or-ovs-or-regexp)
          (setq ov-or-ovs-or-regexp (ov-regexp ov-or-ovs-or-regexp)))
-        (t
+        ((ov-p ov-or-ovs-or-regexp)
          (setq ov-or-ovs-or-regexp (cons ov-or-ovs-or-regexp nil))))
   (when (listp (car-safe properties))
     (setq properties (car properties)))
@@ -244,22 +243,24 @@
   "Get the previous existing overlay from `point'. You can also specify `property' and its `value'."
   (or point (setq point (point)))
   (cond ((and (not property) (not value))
-         (ov-at (previous-overlay-change point)))
+         (ov-at (1- (previous-overlay-change point))))
         ((and property (not value))
          (save-excursion
            (goto-char (previous-overlay-change point))
            (let (ov)
-             (while (and (not (memq property (ov-prop (setq ov (ov-at (1- (point)))))))
-                         (not (bobp)))
+             (while (or (not (setq ov (ov-at (1- (point)))))
+                        (and (not (memq property (ov-prop ov)))
+                             (not (bobp))))
                (goto-char (previous-overlay-change (point))))
              ov)))
         (t
          (save-excursion
            (goto-char (previous-overlay-change point))
            (let (ov)
-             (while (and (not (and (memq property (ov-prop (setq ov (ov-at (1- (point))))))
-                                   (equal value (ov-val ov property))))
-                         (not (bobp)))
+             (while (or (not (setq ov (ov-at (1- (point)))))
+                        (and (not (and (memq property (ov-prop (setq ov (ov-at (1- (point))))))
+                                       (equal value (ov-val ov property))))
+                             (not (bobp))))
                (goto-char (previous-overlay-change (point))))
              ov)))))
 
