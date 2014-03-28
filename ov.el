@@ -208,13 +208,12 @@
 (defmacro ov-timeout (time func func-after)
   "Execute `func-after' after `time' seconds passed since `func' done."
   (declare (indent 1))
-  `(progn
-    ,(if (symbolp func-after)
-         (run-with-timer time nil `(lambda () (funcall ',func-after)))
-       (run-with-timer time nil `(lambda () ,(funcall `(lambda () ,func-after)))))
-    ,(if (symbolp func)
-         (funcall `(lambda () (funcall ',func)))
-       (funcall `(lambda () ,func)))))
+  (if (symbolp func-after)
+      (run-with-timer time nil `(lambda () (funcall ',func-after)))
+    (run-with-timer time nil `(lambda () ,(funcall `(lambda () ,func-after)))))
+  (if (symbolp func)
+      (funcall func)
+    (funcall (lambda () (eval func)))))
 
 (defun ov-next (&optional point property value)
   "Get the next existing overlay from `point'. You can also specify `property' and its `value'."

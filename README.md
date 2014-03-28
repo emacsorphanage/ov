@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ShingoFukuyama/ov.svg?branch=master)](https://travis-ci.org/ShingoFukuyama/ov)
+
 # ov.el
 
 Simple way to manipulate overlay for Emacs.
