@@ -45,7 +45,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 ### Overlay manipulation
 
 * [ov-move](#ov-move-ov-beg-end-optional-buffer) `(ov beg end &optional buffer)`
-* [ov-timeout](#ov-timeout-time-func-func-after) `(time func func-after)`
+<!-- * [ov-timeout](#ov-timeout-time-func-func-after) `(time func func-after)` -->
 * [ov-next](#ov-next-optional-point-property-value) `(&optional point property value)`
 * [ov-prev](#ov-prev-optional-point-property-value) `(&optional point property value)`
 * [ov-read-only](#ov-read-only-ov-or-ovs) `(ov-or-ovs)`
@@ -338,21 +338,21 @@ Return: `overlay`
   (pop-to-buffer "test"))
 ```
 
-#### ov-timeout `(time func func-after)`
+<!-- #### ov-timeout `(time func func-after)` -->
 
-Execute `func-after` after `time` seconds passed since `func` done.
+<!-- Execute `func-after` after `time` seconds passed since `func` done. -->
 
-```cl
-(ov-timeout 0.5
-  '(ov-set "ov" '(face (:background "#ff0000") aaa t))
-  '(ov-clear 'aaa t))
+<!-- ```cl -->
+<!-- (ov-timeout 0.5 -->
+<!--   '(ov-set "ov" '(face (:background "#ff0000") aaa t)) -->
+<!--   '(ov-clear 'aaa t)) -->
 
-(defun ov-fn1 ()
-  (ov-set (ov-match "ov") '(face (:background "#ff9900") bbb t)))
-(defun ov-fn2 ()
-  (ov-clear 'bbb t))
-(ov-timeout 1.2 ov-fn1 ov-fn2)
-```
+<!-- (defun ov-fn1 () -->
+<!--   (ov-set (ov-match "ov") '(face (:background "#ff9900") bbb t))) -->
+<!-- (defun ov-fn2 () -->
+<!--   (ov-clear 'bbb t)) -->
+<!-- (ov-timeout 1.2 ov-fn1 ov-fn2) -->
+<!-- ``` -->
 
 #### ov-next `(&optional point property value)`
 
