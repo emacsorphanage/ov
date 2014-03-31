@@ -21,7 +21,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 
 ### Clear overlay
 
-* [ov-clear](#ov-clear-optional-beg-end-property-value) `(&optional beg end property value)`
+* [ov-clear](#ov-clear-optional-prop-or-beg-val-or-end-beg-end) `(&optional beg end property value)`
 * [ov-reset](#ov-reset-ov-or-ovs-variable) `(ov-or-ovs-variable)`
 
 ### Look up overlay parameters, etc
@@ -52,6 +52,8 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 
 ## Make overlay / Set properties
 
+:link: [Overlay Properties](http://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html)
+
 #### ov `(beg end &rest properties)`
 
 Make an overlay from `beg` and `end`, then set `properties`.
@@ -71,7 +73,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 
 Just make an overlay from `beg` and `end`.
 
-Return: `overlay`
+Return: `overlay`  
 Alias: `ov-create`
 
 ```cl
@@ -147,14 +149,25 @@ Return: `overlay`
 
 ## Clear overlay
 
-#### ov-clear `(&optional beg end property value)`
+#### ov-clear `(&optional prop-or-beg val-or-end beg end)`
 
 Clear `beg` and `end` of overlays whose `property` has `value`.
+
+Arguments pattern:
+
+```cl
+(ov-clear PROPERTY VALUE BEG END)
+(ov-clear PROPERTY VALUE)
+(ov-clear BEG END)
+(ov-clear PROPERTY)
+(ov-clear)
+```
 
 ```cl
 (ov-clear 100 550 'my-fancy-comment t)
 (ov-clear 'face 'font-lock-function-name-face)
 (ov-clear 200 1000)
+(ov-clear 'face)
 (ov-clear) ;; clear overlays in the whole buffer
 ```
 
@@ -448,7 +461,7 @@ It implements a read-only like feature for overlay. It's not as good as that of 
 
 ## Reference
 
-* [Overlay Properties](http://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html)
-* [Face Attributes](http://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html)
-* [Managing Overlays](http://www.gnu.org/software/emacs/manual/html_node/elisp/Managing-Overlays.html)
-* [comint read-only prompt](http://lists.gnu.org/archive/html/emacs-devel/2002-08/msg00428.html)
+* :link: [Overlay Properties](http://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html)
+* :link: [Face Attributes](http://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html)
+* :link: [Managing Overlays](http://www.gnu.org/software/emacs/manual/html_node/elisp/Managing-Overlays.html)
+* :link: [comint read-only prompt](http://lists.gnu.org/archive/html/emacs-devel/2002-08/msg00428.html)

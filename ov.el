@@ -135,15 +135,41 @@
 
 ;; Delete overlay --------------------------------------------------------------
 ;;;###autoload
-(defun ov-clear (&optional beg end property value)
+(cl-defun ov-clear (&optional prop-or-beg (val-or-end 'any) beg end)
   "Clear `beg' and `end' of overlays whose `property' has `value'."
   (interactive)
-  (let ((args (cond ((and (numberp beg) (numberp end))
-                     (list beg end property value))
-                    ((and (not property) (not value))
-                     (list nil nil beg end)))))
-    (ov-recenter (point-max))
-    (apply 'remove-overlays args)))
+  (cl-labels ((clear
+               (con beg end)
+               (ov-recenter (or end (point-max)))
+               (mapc (lambda (ov)
+                       (when (and (memq prop-or-beg (ov-prop ov))
+                                  (if con
+                                      t (equal val-or-end (ov-val ov prop-or-beg))))
+                         (delete-overlay ov)))
+                     (overlays-in beg end))))
+    (cond
+     ;; (ov-clear)
+     ((and (not prop-or-beg) (eq 'any val-or-end) (not beg) (not end))
+      (ov-recenter (point-max))
+      (remove-overlays (point-min) (point-max)))
+     ;; (ov-clear 10 500)
+     ((and (numberp prop-or-beg) (numberp val-or-end))
+      (ov-recenter val-or-end)
+      (remove-overlays prop-or-beg val-or-end))
+     ;; (ov-clear 'face 'warning)
+     ((and (symbolp prop-or-beg) (not (eq 'any val-or-end)) (not beg) (not end))
+      (clear nil (point-min) (point-max)))
+     ;; (ov-clear 'face) or (ov-clear 'face 'any)
+     ((and (symbolp prop-or-beg) (eq 'any val-or-end) (not beg) (not end))
+      (clear t (point-min) (point-max)))
+     ;; (ov-clear 'face 'worning 10 500)
+     ((and (symbolp prop-or-beg) (not (eq 'any val-or-end)) (numberp beg) (numberp end))
+      (clear nil beg end))
+     ;; (ov-clear 'face 'any 10 500)
+     ((and (symbolp prop-or-beg) (eq 'any val-or-end) (numberp beg) (numberp end))
+      (clear t beg end))
+     (t nil)))
+  nil)
 
 (defmacro ov-reset (ov-or-ovs-variable)
   "Clear overlays in `ov-or-ovs-variable'. The variable is going to be nil."
@@ -187,12 +213,12 @@
 
 ;; Get overlays between `beg' and `end'.
 (cl-defun ov-in (&optional prop-or-beg (val-or-end 'any) beg end)
-  (cl-labels ((in ($cond beg end)
+  (cl-labels ((in (con beg end)
                   (delq nil
                         (mapcar
                          (lambda ($ov)
                            (when (and (memq prop-or-beg (ov-prop $ov))
-                                      (if $cond
+                                      (if con
                                           t (equal val-or-end (ov-val $ov prop-or-beg))))
                              $ov))
                          (overlays-in beg end)))))
