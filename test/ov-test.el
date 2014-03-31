@@ -139,6 +139,16 @@
   (backward-char 1)
   (should-not (ov? (ov-at))))
 
+(ert-deftest ov-test/ov-in ()
+  (ov-test-insert-dammy-text)
+  (ov-set "the" 'face 'warning)
+  (ov-set "it" 'face 'success)
+  (ov-set "is" 'face 'underline 'aaa t)
+  (should (eq 23 (length (ov-in))))
+  (should (eq 7 (length (ov-in 'aaa))))
+  (should (eq 8 (length (ov-in 'face 'warning))))
+  (should (eq 3 (length (ov-in 'face 'success 1 253)))))
+
 (ert-deftest ov-test/ov-timeout ()
   (ov-test-insert-dammy-text)
   (ov-timeout 0.3
@@ -164,7 +174,11 @@
   (should (eq (point-at-eol)
               (ov-end (ov-next nil 'bbb))))
   (should (eq (point-at-eol)
-              (ov-end (ov-next nil 'bbb t)))))
+              (ov-end (ov-next nil 'bbb t))))
+  (should (eq (point-at-eol)
+              (ov-end (ov-next 'bbb))))
+  (should (eq (point-at-eol)
+              (ov-end (ov-next 'bbb t)))))
 
 (ert-deftest ov-test/ov-prev ()
   (ov-test-insert-dammy-text)
@@ -176,7 +190,11 @@
   (should (eq (point-at-bol)
               (ov-beg (ov-prev nil 'bbb))))
   (should (eq (point-at-bol)
-              (ov-beg (ov-prev nil 'bbb t)))))
+              (ov-beg (ov-prev nil 'bbb t))))
+  (should (eq (point-at-bol)
+              (ov-beg (ov-prev 'bbb))))
+  (should (eq (point-at-bol)
+              (ov-beg (ov-prev 'bbb t)))))
 
 (provide 'ov-test)
 ;;; ov-test.el ends here

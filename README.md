@@ -37,7 +37,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 ### Get an existing overlay or overlay list
 
 * [ov-at](#ov-at-optional-point) `(&optional point)`
-* [ov-in](#ov-in-beg-end) `(beg end)`
+* [ov-in](#ov-in-prop-or-beg-val-or-end-beg-end) `(prop-or-beg val-or-end beg end)`
 * [ov-all](#ov-all)
 * [ov-backwards](#ov-backwards-optional-point) `(&optional point)`
 * [ov-forwards](#ov-forwards-optional-point) `(&optional point)`
@@ -280,11 +280,36 @@ Return: `overlay` or `nil`
   (ov-at))        ; => #<overlay from 20 to 50 in *scratch*>
 ```
 
-#### ov-in `(beg end)`
+#### ov-in `(prop-or-val val-or-end beg end)`
 
 Get overlays within from `beg` to `end`.
 
 Return: `overlay list`
+
+Arguments pattern:
+
+```
+(ov-next PROPERTY VALUE BEG END)
+(ov-next PROPERTY VALUE)
+(ov-next PROPERTY)
+(ov-next BEG END)
+(ov-next)
+```
+
+```cl
+;; Get all overlays
+(setq ov1 (ov-in))
+;; Get overlays between 10 and 500
+(setq ov2 (ov-in 10 500))
+;; Get the overlays which has a specific property and its value
+(setq ov3 (ov-in 'face 'warning))
+;; Get the overlays which has a specific property
+(setq ov4 (ov-in 'face))
+;; Get the overlays between 10 and 500, which has a specific property and its value
+(setq ov5 (ov-in 'face 'worning 10 500))
+;; If 'any specified to val-or-end, it matches any value
+(setq ov6 (ov-in 'face 'any 10 500))
+```
 
 #### ov-all
 
@@ -354,9 +379,20 @@ Return: `overlay`
 <!-- (ov-timeout 1.2 ov-fn1 ov-fn2) -->
 <!-- ``` -->
 
-#### ov-next `(&optional point property value)`
+#### ov-next `(&optional point-or-prop prop-or-point val)`
 
-Get the next existing overlay from `point`. You can also specify `property` and its `value`.
+Get the next existing overlay from `point-or-prop`. You can also specify `prop-or-point` and its `val`.
+
+Return: `overlay`
+
+Arguments pattern:
+
+```
+(ov-next POINT PROPERTY VALUE)
+(ov-next PROPERTY VALUE)
+(ov-next PROPERTY)
+(ov-next)
+```
 
 ```cl
 (ov-set "^.." '(face (:background "#ff9900") aaa t))
@@ -364,11 +400,27 @@ Get the next existing overlay from `point`. You can also specify `property` and 
 (ov-next)         ; => #<overlay from 436 to 438 in *scratch*>
 (goto-char (ov-beg (ov-next nil 'aaa)))
 (goto-char (ov-end (ov-next nil 'bbb t)))
+
+(ov-next 'aaa)
+(ov-next 'aaa t)
+(ov-next 300 'aaa)
+(ov-next (point) 'aaa t)
 ```
 
 #### ov-prev `(&optional point property value)`
 
 Get the previous existing overlay from `point`. You can also specify `property` and its `value`.
+
+Return: `overlay`
+
+Arguments pattern:
+
+```
+(ov-prev POINT PROPERTY VALUE)
+(ov-prev PROPERTY VALUE)
+(ov-prev PROPERTY)
+(ov-prev)
+```
 
 ```cl
 (ov-set (ov-match "o") '(face (:box t) my-char o))
@@ -376,6 +428,11 @@ Get the previous existing overlay from `point`. You can also specify `property` 
 (ov-prev)         ; => #<overlay from 482 to 483 in *scratch*>
 (goto-char (ov-beg (ov-prev (point) 'face)))
 (goto-char (ov-end (ov-prev nil 'my-char 'o)))
+
+(ov-prev 'my-char)
+(ov-prev 'my-char 'o)
+(ov-prev 300 'my-char)
+(ov-prev (point) 'my-char 'o)
 ```
 
 #### ov-read-only `(ov-or-ovs)`

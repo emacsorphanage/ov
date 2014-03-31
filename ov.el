@@ -26,6 +26,8 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
 (defgroup ov nil
   "Group for ov.el"
   :prefix "ov-" :group 'development)
@@ -183,12 +185,41 @@
   (or point (setq point (point)))
   (car (overlays-at point)))
 
-;; Get overlays within from `beg' to `end'.
-(defalias 'ov-in 'overlays-in)
+;; Get overlays between `beg' and `end'.
+(cl-defun ov-in (&optional prop-or-beg (val-or-end 'any) beg end)
+  (cl-labels ((in ($cond beg end)
+                  (delq nil
+                        (mapcar
+                         (lambda ($ov)
+                           (when (and (memq prop-or-beg (ov-prop $ov))
+                                      (if $cond
+                                          t (equal val-or-end (ov-val $ov prop-or-beg))))
+                             $ov))
+                         (overlays-in beg end)))))
+    (cond
+     ;; (ov-in)
+     ((and (not prop-or-beg) (eq 'any val-or-end) (not beg) (not end))
+      (overlays-in (point-min) (point-max)))
+     ;; (ov-in 10 500)
+     ((and (numberp prop-or-beg) (numberp val-or-end))
+      (overlays-in prop-or-beg val-or-end))
+     ;; (ov-in 'face 'warning)
+     ((and (symbolp prop-or-beg) (not (eq 'any val-or-end)) (not beg) (not end))
+      (in nil (point-min) (point-max)))
+     ;; (ov-in 'face) or (ov-in 'face 'any)
+     ((and (symbolp prop-or-beg) (eq 'any val-or-end) (not beg) (not end))
+      (in t (point-min) (point-max)))
+     ;; (ov-in 'face 'worning 10 500)
+     ((and (symbolp prop-or-beg) (not (eq 'any val-or-end)) (numberp beg) (numberp end))
+      (in nil beg end))
+     ;; (ov-in 'face 'any 10 500)
+     ((and (symbolp prop-or-beg) (eq 'any val-or-end) (numberp beg) (numberp end))
+      (in t beg end))
+     (t nil))))
 
 (defun ov-all ()
   "Get overlays in the whole buffer."
-  (ov-in (point-min) (point-max)))
+  (overlays-in (point-min) (point-max)))
 
 (defun ov-backwards (&optional point)
   "Get overlays within from the beginning of the buffer to `point'."
@@ -215,59 +246,76 @@
       (funcall func)
     (funcall (lambda () (eval func)))))
 
-(defun ov-next (&optional point property value)
-  "Get the next existing overlay from `point'. You can also specify `property' and its `value'."
-  (or point (setq point (point)))
-  (cond ((and (not property) (not value))
-         (let* ((po (next-overlay-change point))
-                (ov (ov-at po)))
-           (if (ov? ov)
-               ov
-             (ov-at (next-overlay-change po)))))
-        ((and property (not value))
-         (save-excursion
-           (goto-char (next-overlay-change point))
-           (let (ov)
-             (while (and (not (if (setq ov (ov-at (point)))
-                                  (memq property (ov-prop ov))))
-                         (not (if (eobp) (progn (setq ov nil) t))))
-               (goto-char (next-overlay-change (point))))
-             ov)))
-        (t
-         (save-excursion
-           (goto-char (next-overlay-change point))
-           (let (ov)
-             (while (and (not (if (setq ov (ov-at (point)))
-                                  (and (memq property (ov-prop ov))
-                                       (equal value (ov-val ov property)))))
-                         (not (if (eobp) (progn (setq ov nil) t))))
-               (goto-char (next-overlay-change (point))))
-             ov)))))
+(cl-defun ov-next (&optional point-or-prop prop-or-val (val 'any))
+  "Get the next existing overlay from `point-or-prop'. You can also specify `prop-or-val' and its `val'."
+  (cl-labels ((next
+               (po pr va)
+               (save-excursion
+                 (goto-char (next-overlay-change po))
+                 (let (ov)
+                   (while (and (not (if (setq ov (ov-at (point)))
+                                        (and (memq pr (ov-prop ov))
+                                             (if (eq 'any va)
+                                                 t (equal va (ov-val ov pr))))))
+                               (not (if (eobp) (progn (setq ov nil) t))))
+                     (goto-char (next-overlay-change (point))))
+                   ov))))
+    (cond
+     ;; (ov-next) or (ov-next 300)
+     ((and (or (numberp point-or-prop) (not point-or-prop))
+           (not prop-or-val) (eq 'any val))
+      (let* ((po (next-overlay-change (or point-or-prop (point))))
+             (ov (ov-at po)))
+        (if (ov? ov)
+            ov
+          (ov-at (next-overlay-change po)))))
+     ;; (ov-next 'face)
+     ((and point-or-prop (symbolp point-or-prop) (not prop-or-val) (eq 'any val))
+      (next (point) point-or-prop 'any))
+     ;; (ov-next 'face 'warning)
+     ((and point-or-prop (symbolp point-or-prop) prop-or-val (eq 'any val))
+      (next (point) point-or-prop prop-or-val))
+     ;; (ov-next 300 'face 'warning)
+     ((and (or (not point-or-prop) (numberp point-or-prop))
+           (symbolp prop-or-val) (not (eq 'any val)))
+      (next (or point-or-prop (point)) prop-or-val val))
+     ;; (ov-next 300 'face)
+     ((and (or (numberp point-or-prop) (not point-or-prop)) (symbolp prop-or-val))
+      (next (or point-or-prop (point)) prop-or-val val))
+     (t nil))))
 
-(defun ov-prev (&optional point property value)
-  "Get the previous existing overlay from `point'. You can also specify `property' and its `value'."
-  (or point (setq point (point)))
-  (cond ((and (not property) (not value))
-         (ov-at (1- (previous-overlay-change point))))
-        ((and property (not value))
-         (save-excursion
-           (goto-char (previous-overlay-change point))
-           (let (ov)
-             (while (and (not (if (setq ov (ov-at (1- (point))))
-                                  (memq property (ov-prop ov))))
-                         (not (if (bobp) (progn (setq ov nil) t))))
-               (goto-char (previous-overlay-change (point))))
-             ov)))
-        (t
-         (save-excursion
-           (goto-char (previous-overlay-change point))
-           (let (ov)
-             (while (and (not (if (setq ov (ov-at (1- (point))))
-                                  (and (memq property (ov-prop ov))
-                                       (equal value (ov-val ov property)))))
-                         (not (if (bobp) (progn (setq ov nil) t))))
-               (goto-char (previous-overlay-change (point))))
-             ov)))))
+(cl-defun ov-prev (&optional point-or-prop prop-or-val (val 'any))
+  "Get the previous existing overlay from `point-or-prop'. You can also specify `prop-or-val' and its `val'."
+  (cl-labels ((prev
+               (po pr va)
+               (save-excursion
+                 (goto-char (previous-overlay-change po))
+                 (let (ov)
+                   (while (and (not (if (setq ov (ov-at (1- (point))))
+                                        (and (memq pr (ov-prop ov))
+                                             (if (eq 'any va)
+                                                 t (equal va (ov-val ov pr))))))
+                               (not (if (bobp) (progn (setq ov nil) t))))
+                     (goto-char (previous-overlay-change (point))))
+                   ov))))
+    (cond
+     ((and (or (numberp point-or-prop) (not point-or-prop))
+           (not prop-or-val) (eq 'any val))
+      (ov-at (1- (previous-overlay-change (or point-or-prop (point))))))
+     ;; (ov-prev 'face)
+     ((and point-or-prop (symbolp point-or-prop) (not prop-or-val) (eq 'any val))
+      (prev (point) point-or-prop 'any))
+     ;; (ov-prev 'face 'warning)
+     ((and point-or-prop (symbolp point-or-prop) prop-or-val (eq 'any val))
+      (prev (point) point-or-prop prop-or-val))
+     ;; (ov-prev 300 'face 'warning)
+     ((and (or (not point-or-prop) (numberp point-or-prop))
+           (symbolp prop-or-val) (not (eq 'any val)))
+      (prev (or point-or-prop (point)) prop-or-val val))
+     ;; (ov-prev 300 'face)
+     ((and (or (numberp point-or-prop) (not point-or-prop)) (symbolp prop-or-val))
+      (prev (or point-or-prop (point)) prop-or-val val))
+     (t nil))))
 
 
 ;; Impliment pseudo read-only overlay function ---------------------------------
