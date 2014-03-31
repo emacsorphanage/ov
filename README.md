@@ -46,8 +46,8 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 
 * [ov-move](#ov-move-ov-beg-end-optional-buffer) `(ov beg end &optional buffer)`
 <!-- * [ov-timeout](#ov-timeout-time-func-func-after) `(time func func-after)` -->
-* [ov-next](#ov-next-optional-point-property-value) `(&optional point property value)`
-* [ov-prev](#ov-prev-optional-point-property-value) `(&optional point property value)`
+* [ov-next](#ov-next-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
+* [ov-prev](#ov-prev-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
 * [ov-read-only](#ov-read-only-ov-or-ovs) `(ov-or-ovs)`
 
 ## Make overlay / Set properties
@@ -289,11 +289,11 @@ Return: `overlay list`
 Arguments pattern:
 
 ```
-(ov-next PROPERTY VALUE BEG END)
-(ov-next PROPERTY VALUE)
-(ov-next PROPERTY)
-(ov-next BEG END)
-(ov-next)
+(ov-in PROPERTY VALUE BEG END)
+(ov-in PROPERTY VALUE)
+(ov-in PROPERTY)
+(ov-in BEG END)
+(ov-in)
 ```
 
 ```cl
@@ -407,7 +407,7 @@ Arguments pattern:
 (ov-next (point) 'aaa t)
 ```
 
-#### ov-prev `(&optional point property value)`
+#### ov-prev `(&optional point-or-prop prop-or-point val)`
 
 Get the previous existing overlay from `point`. You can also specify `property` and its `value`.
 
