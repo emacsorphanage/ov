@@ -3,6 +3,11 @@
 
 Simple way to manipulate overlay for Emacs.
 
+![ov.el](https://raw2.github.com/ShingoFukuyama/images/master/ov1.gif)
+
+Overlay is capable of manipulating text appearance, cursor behavior, etc.  
+It's not affect font-lock or text-properties.
+
 ## Command
 
 You can always do `M-x ov-clear` to clear all overlays in the current buffer.
