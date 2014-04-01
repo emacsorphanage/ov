@@ -490,7 +490,7 @@ It implements a read-only like feature for overlay. It's not as good as that of 
 ;; You will be able to prevent some commands from modifying "setq" strings.
 ```
 
-## Another useful examples
+## Useful examples
 
 #### Add keybinds specific to overlay area
 
@@ -509,6 +509,19 @@ Assign keybind that works only where the cursor is on the overlays.
     map))
 (ov-set "key" 'face 'warning 'keymap ov1-map 'ov1 t)
 ```
+
+#### Evaporative overlay
+
+When you modify one of the overlaid text, all their overlays will be evaporated.
+
+```cl
+(defun my-ov-evaporate-ov1 (_ov _after _beg _end &optional _len)
+  (ov-clear 'ov1))
+(ov-set "ov-" 'face 'warning
+              'ov1 t
+              'modification-hooks '(my-ov-evaporate-ov1))
+```
+
 
 ## Reference
 
