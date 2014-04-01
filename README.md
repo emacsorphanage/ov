@@ -500,10 +500,14 @@ Assign keybind that works only where the cursor is on the overlays.
 (defvar ov1-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-d") 'ov-clear)
-    (define-key map (kbd "M-n")
+    (define-key map (kbd "M-b")
       (lambda () (interactive) (ov-set (ov-at) 'face '(:box t))))
+    (define-key map (kbd "M-n")
+      (lambda () (interactive) (if (ov-goto-next 'ov1) (backward-char 1))))
+    (define-key map (kbd "M-p")
+      (lambda () (interactive) (ov-goto-prev 'ov1)))
     map))
-(ov-set "key" 'face 'warning 'keymap ov1-map)
+(ov-set "key" 'face 'warning 'keymap ov1-map 'ov1 t)
 ```
 
 ## Reference
