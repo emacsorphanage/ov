@@ -58,13 +58,16 @@
 
 ;; Make overlay / Set properties -----------------------------------------------
 (defun ov (beg end &rest properties)
-  "Make an overlay from `beg' and `end', then set `properties'."
-  ;; To pass properties to `ov-set'
-  (when (listp (car-safe properties))
-    (setq properties (car properties)))
-  (let ((o (ov-make beg end)))
-    (ov-set o properties)
-    o))
+  "Make an overlay from `beg' and `end', then set `properties` if it's specified."
+  (if properties
+      (progn
+        ;; To pass properties to `ov-set'
+        (when (listp (car-safe properties))
+          (setq properties (car properties)))
+        (let ((o (ov-make beg end)))
+          (ov-set o properties)
+          o))
+    (make-overlay beg end)))
 
 ;; Just make an overlay from `beg' and `end'.
 ;; Alias                             ;; Argument

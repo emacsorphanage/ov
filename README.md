@@ -6,7 +6,7 @@ Simple way to manipulate overlay for Emacs.
 ![ov.el](https://raw2.github.com/ShingoFukuyama/images/master/ov1.gif)
 
 Overlay is capable of manipulating text appearance, cursor behavior, etc.  
-It's not affect font-lock or text-properties.
+It doesn't affect font-lock or text-properties.
 
 ## Command
 
@@ -61,7 +61,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 
 #### ov `(beg end &rest properties)`
 
-Make an overlay from `beg` and `end`, then set `properties`.
+Make an overlay from `beg` and `end`, then set `properties` if it's specified.
 
 Return: `overlay`
 
@@ -70,6 +70,8 @@ Return: `overlay`
 (ov 30 80 '(face font-lock-warning-face intangible t))
 (ov (point-min) (point) 'face '(:background "#00ff00" :height 1.5))
 (ov (point-min) (point-max) '(face (:background "#00ff00" :height 1.5)))
+;; Just make an overlay without setting properties
+(setq ov1 (ov 5 15))    ; => #<overlay from 5 to 15 in *scratch*>
 ```
 
 You can always do `M-x ov-clear` to clear all overlays in the current buffer.
