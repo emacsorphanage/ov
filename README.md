@@ -17,7 +17,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 ### Make overlay / Set properties
 
 * [ov](#ov-beg-end-rest-properties) `(beg end &rest properties)`
-* [ov-make](#ov-make-beg-end) `(beg end)`
+* [ov-make](#ov-make-beg-end-optional-buffer-front-nonsticky-rear-sticky) `(beg end)`
 * [ov-line](#ov-line-optional-point) `(&optional point)`
 * [ov-match](#ov-match-string-optional-beg-end) `(string &optional beg end)`
 * [ov-regexp](#ov-regexp-regexp-optional-beg-end) `(regexp &optional beg end)`
@@ -50,12 +50,13 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 ### Overlay manipulation
 
 * [ov-move](#ov-move-ov-beg-end-optional-buffer) `(ov beg end &optional buffer)`
-<!-- * [ov-timeout](#ov-timeout-time-func-func-after) `(time func func-after)` -->
 * [ov-next](#ov-next-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
 * [ov-prev](#ov-prev-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
 * [ov-goto-next](#ov-goto-next-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
 * [ov-goto-prev](#ov-goto-prev-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
-* [ov-read-only](#ov-read-only-ov-or-ovs) `(ov-or-ovs)`
+
+<!-- * [ov-read-only](#ov-read-only-ov-or-ovs) `(ov-or-ovs)` -->
+<!-- * [ov-timeout](#ov-timeout-time-func-func-after) `(time func func-after)` -->
 
 ## Make overlay / Set properties
 
@@ -78,7 +79,7 @@ Return: `overlay`
 
 You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 
-#### ov-make `(beg end)`
+#### ov-make `(beg end &optional buffer front-advance rear-advance)`
 
 Just make an overlay from `beg` and `end`.
 
@@ -88,6 +89,11 @@ Alias: `ov-create`
 ```cl
 (setq ov1 (ov-make 10 55))           ; => #<overlay from 10 to 55 in *scratch*>
 (setq ov2 (ov-make (point-min) 25))  ; => #<overlay from 1 to 25 in *scratch*>
+;; Third argument is buffer object. If it's ommited or nil, it will be current buffer object.
+(setq ov3 (ov-make 10 20 (get-buffer "README.md"))) ; => #<overlay from 10 to 20 in README.md>
+;; If fourth argument is t, overlay won't be inherited by inserting (like front-nonsticky in text-property).
+;; If fifth  argument is t, overlay will  be inherited by inserting (like rear-sticky in text-property).
+(setq ov4 (ov-make 15 30 nil t nil)) ; => #<overlay from 15 to 30 in *scratch*>
 ```
 
 #### ov-line `(&optional point)`
@@ -479,16 +485,16 @@ Move cursor to the previous overlay position. You can specify arguments the same
 (ov-goto-prev 300 'face 'warning)
 ```
 
-#### ov-read-only `(ov-or-ovs)`
+<!-- #### ov-read-only `(ov-or-ovs)` -->
 
-It implements a read-only like feature for overlay. It's not as good as that of the text property.
+<!-- It implements a read-only like feature for overlay. It's not as good as that of the text property. -->
 
-```cl
-(setq ov1 (ov-match "setq"))
-(ov-set ov1 'face 'success)
-(ov-read-only ov1)
-;; You will be able to prevent some commands from modifying "setq" strings.
-```
+<!-- ```cl -->
+<!-- (setq ov1 (ov-match "setq")) -->
+<!-- (ov-set ov1 'face 'success) -->
+<!-- (ov-read-only ov1) -->
+<!-- ;; You will be able to prevent some commands from modifying "setq" strings. -->
+<!-- ``` -->
 
 ## Useful examples
 

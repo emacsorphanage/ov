@@ -64,7 +64,7 @@
         ;; To pass properties to `ov-set'
         (when (listp (car-safe properties))
           (setq properties (car properties)))
-        (let ((o (ov-make beg end)))
+        (let ((o (ov-make beg end nil t)))
           (ov-set o properties)
           o))
     (make-overlay beg end)))
@@ -79,7 +79,7 @@
   (let (o)
     (save-excursion
       (goto-char (or point (point)))
-      (setq o (ov-make (point-at-bol) (min (1+ (point-at-eol)) (point-max)))))
+      (setq o (ov-make (point-at-bol) (min (1+ (point-at-eol)) (point-max)) nil t)))
     o))
 
 (defun ov-match (string &optional beg end)
@@ -90,7 +90,8 @@
       (ov-recenter (point-max))
       (while (search-forward string end t)
         (setq ov-or-ovs (cons (ov-make (match-beginning 0)
-                                            (match-end 0)) ov-or-ovs)))
+                                       (match-end 0) nil t)
+                              ov-or-ovs)))
       ov-or-ovs)))
 
 (defun ov-regexp (regexp &optional beg end)
@@ -101,13 +102,14 @@
       (ov-recenter (point-max))
       (while (re-search-forward regexp end t)
         (setq ov-or-ovs (cons (ov-make (match-beginning 0)
-                                            (match-end 0)) ov-or-ovs)))
+                                       (match-end 0) nil t)
+                              ov-or-ovs)))
       ov-or-ovs)))
 
 (defun ov-region ()
   "Make an overlay from a region, when you make a region"
   (if mark-active
-      (let ((o (ov-make (region-beginning) (region-end))))
+      (let ((o (ov-make (region-beginning) (region-end) nil t)))
         (deactivate-mark t)
         o)
     (error "Error: Need to make region")))
