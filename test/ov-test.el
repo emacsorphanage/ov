@@ -196,5 +196,39 @@
   (should (eq (point-at-bol)
               (ov-beg (ov-prev 'bbb t)))))
 
+(ert-deftest ov-test/ov-goto-next ()
+  (ov-test-insert-dammy-text)
+  (ov-set "the" 'face 'warning 'aaa t)
+  (ov-set "is"  'face 'success 'bbb t)
+  (should (eq 19 (save-excursion
+                   (goto-char (point-min))
+                   (ov-goto-next)
+                   (ov-goto-next))))
+  (should (eq 101 (save-excursion
+                    (goto-char (point-min))
+                    (ov-goto-next 'aaa)
+                    (ov-goto-next 'aaa))))
+  (should (eq 261 (save-excursion
+                    (goto-char (point-min))
+                    (ov-goto-next 100 'bbb t)
+                    (ov-goto-next 'bbb t)))))
+
+(ert-deftest ov-test/ov-goto-prev ()
+  (ov-test-insert-dammy-text)
+  (ov-set "the" 'face 'warning 'aaa t)
+  (ov-set "is"  'face 'success 'bbb t)
+  (should (eq 363 (save-excursion
+                    (goto-char (point-max))
+                    (ov-goto-prev)
+                    (ov-goto-prev))))
+  (should (eq 270 (save-excursion
+                    (goto-char (point-max))
+                    (ov-goto-prev 'bbb)
+                    (ov-goto-prev 'bbb))))
+  (should (eq 17 (save-excursion
+                   (goto-char (point-max))
+                   (ov-goto-prev 100 'bbb t)
+                   (ov-goto-prev 'bbb t)))))
+
 (provide 'ov-test)
 ;;; ov-test.el ends here

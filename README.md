@@ -53,6 +53,8 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 <!-- * [ov-timeout](#ov-timeout-time-func-func-after) `(time func func-after)` -->
 * [ov-next](#ov-next-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
 * [ov-prev](#ov-prev-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
+* [ov-goto-next](#ov-goto-next-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
+* [ov-goto-prev](#ov-goto-prev-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
 * [ov-read-only](#ov-read-only-ov-or-ovs) `(ov-or-ovs)`
 
 ## Make overlay / Set properties
@@ -453,6 +455,28 @@ Arguments pattern:
 (ov-prev 'my-char 'o)
 (ov-prev 300 'my-char)
 (ov-prev (point) 'my-char 'o)
+```
+
+#### ov-goto-next `(&optional point-or-prop prop-or-point val)`
+
+Move cursor to the next overlay position. You can specify arguments the same as `ov-next` above.
+
+```cl
+(ov-goto-next)
+(ov-goto-next 'face)
+(ov-goto-next 'face 'warning)
+(ov-goto-next 300 'face 'warning)
+```
+
+#### ov-goto-prev `(&optional point-or-prop prop-or-point val)`
+
+Move cursor to the previous overlay position. You can specify arguments the same as `ov-prev` above.
+
+```cl
+(ov-goto-prev)
+(ov-goto-prev 'face)
+(ov-goto-prev 'face 'warning)
+(ov-goto-prev 300 'face 'warning)
 ```
 
 #### ov-read-only `(ov-or-ovs)`

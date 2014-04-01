@@ -331,7 +331,9 @@
     (cond
      ((and (or (numberp point-or-prop) (not point-or-prop))
            (not prop-or-val) (eq 'any val))
-      (ov-at (1- (previous-overlay-change (or point-or-prop (point))))))
+      (let* ((pos (previous-overlay-change (or point-or-prop (point))))
+             (try1 (ov-at pos)))
+        (if try1 try1 (ov-at (1- pos)))))
      ;; (ov-prev 'face)
      ((and point-or-prop (symbolp point-or-prop) (not prop-or-val) (eq 'any val))
       (prev (point) point-or-prop 'any))
@@ -346,6 +348,16 @@
      ((and (or (numberp point-or-prop) (not point-or-prop)) (symbolp prop-or-val))
       (prev (or point-or-prop (point)) prop-or-val val))
      (t nil))))
+
+(cl-defun ov-goto-next (&optional point-or-prop prop-or-val (val 'any))
+  (interactive)
+  (let ((o (ov-next point-or-prop prop-or-val val)))
+    (if o (goto-char (ov-end o)))))
+
+(cl-defun ov-goto-prev (&optional point-or-prop prop-or-val (val 'any))
+  (interactive)
+  (let ((o (ov-prev point-or-prop prop-or-val val)))
+    (if o (goto-char (ov-beg o)))))
 
 
 ;; Impliment pseudo read-only overlay function ---------------------------------
