@@ -490,6 +490,22 @@ It implements a read-only like feature for overlay. It's not as good as that of 
 ;; You will be able to prevent some commands from modifying "setq" strings.
 ```
 
+## Another useful examples
+
+#### Add keybinds specific to overlay area
+
+Assign keybind that works only where the cursor is on the overlays.
+
+```
+(defvar ov1-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-d") 'ov-clear)
+    (define-key map (kbd "M-n")
+      (lambda () (interactive) (ov-set (ov-at) 'face '(:box t))))
+    map))
+(ov-set "key" 'face 'warning 'keymap ov1-map)
+```
+
 ## Reference
 
 * :link: [Overlay Properties](http://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html)
