@@ -54,7 +54,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 * [ov-prev](#ov-prev-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
 * [ov-goto-next](#ov-goto-next-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
 * [ov-goto-prev](#ov-goto-prev-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
-* [ov-keybind](#ov-keybind-ov-or-ovs-or-id-rest-keybinds) `(ov-or-ovs-or-id &rest keybinds)`
+* [ov-keymap](#ov-keymap-ov-or-ovs-or-id-rest-keybinds) `(ov-or-ovs-or-id &rest keybinds)`
 
 <!-- * [ov-read-only](#ov-read-only-ov-or-ovs) `(ov-or-ovs)` -->
 <!-- * [ov-timeout](#ov-timeout-time-func-func-after) `(time func func-after)` -->
@@ -481,7 +481,7 @@ Move cursor to the previous overlay position. You can specify arguments the same
 (ov-goto-prev 300 'face 'warning)
 ```
 
-#### ov-keybind `(ov-or-ovs-or-id &rest keybinds)`
+#### ov-keymap `(ov-or-ovs-or-id &rest keybinds)`
 
 Set `keybinds` to an overlay or overlays in a list.  
 If `ov-or-ovs-or-id` is any symbol, the `keybinds` will be enabled in the whole buffer, and it works even if new inputs inserting at the both edges of the buffer.
