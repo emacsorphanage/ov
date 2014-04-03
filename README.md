@@ -497,7 +497,7 @@ Move cursor to the previous overlay position. You can specify arguments the same
 
 Assign keybind that works only where the cursor is on the overlays.
 
-```
+```cl
 (defvar ov1-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-d") 'ov-clear)
@@ -509,6 +509,35 @@ Assign keybind that works only where the cursor is on the overlays.
       (lambda () (interactive) (ov-goto-prev 'ov1)))
     map))
 (ov-set "key" 'face 'warning 'keymap ov1-map 'ov1 t)
+```
+
+#### Sticky overlay
+
+A sticky overlay will be inherited by inserting at the both sides of the one.
+
+```cl
+(let ((ov-sticky-front t)
+      (ov-sticky-rear t))
+  (ov-set "ov-[^\s]+" 'face 'warning))
+```
+
+#### Override/Replace buffer keybind
+
+Override or replace keybind on the buffer by 'local-map or 'keymap property.
+The two properties are a bit different. See: [Overlay Properties](http://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html)
+
+```cl
+(defun ov-test-message1 () (interactive) (message "aaa"))
+(defun ov-test-message2 () (interactive) (message "bbb"))
+;; Set keybinds the whole buffer
+(let ((map (make-sparse-keymap))
+      (ov-sticky-front t)
+      (ov-sticky-rear  t))
+  (define-key map (kbd "C-a") 'ov-test-message1)
+  (define-key map (kbd "M-a") 'ov-test-message2)
+  (ov (point-min) (point-max) 'local-map map 'my-keymap-test t))
+;; Delete keymap overlay
+(ov-clear 'my-keymap-test)
 ```
 
 #### Evaporative overlay
@@ -523,15 +552,6 @@ When you modify one of the overlaid text, all their overlays will be evaporated.
               'modification-hooks '(my-ov-evaporate-ov1))
 ```
 
-#### Sticky overlay
-
-A sticky overlay will be inherited by inserting at the both sides of the one.
-
-```
-(let ((ov-sticky-front t)
-      (ov-sticky-rear t))
-  (ov-set "ov-[^\s]+" 'face 'warning))
-```
 
 ## Reference
 
