@@ -370,6 +370,33 @@
   (interactive)
   (let ((o (ov-prev point-or-prop prop-or-val val)))
     (if o (goto-char (ov-beg o)))))
+
+(defmacro ov-keymap (ov-or-ovs-or-id &rest keybinds)
+  "Set `keybinds' to an overlay or overlays in a list.
+If `ov-or-ovs-or-id' is any symbol, the `keybinds' will be enabled in the whole buffer,
+and it works even if new inputs inserting at the both edges of the buffer."
+  (declare (indent 1))
+  `(let ((map (make-sparse-keymap))
+         (keys (list ,@keybinds)))
+     (when (cl-evenp (length keys))
+       (while keys
+         (let ((key (pop keys))
+               (fn  (pop keys)))
+           (define-key map
+             (cl-typecase key
+               (vector key)
+               (string (kbd key))
+               (t (error "Error: invalid key")))
+             (cl-typecase fn
+               (command fn)
+               (cons `(lambda () (interactive) ,fn))
+               (t (error "Error: invalid function")))))))
+     (if (symbolp ,ov-or-ovs-or-id)
+         (let ((ov-sticky-front t)
+               (ov-sticky-rear  t))
+           (ov (point-min) (point-max) 'local-map map ,ov-or-ovs-or-id t))
+       (ov-set ,ov-or-ovs-or-id 'local-map map))
+     nil))
 
 
 ;; Impliment pseudo read-only overlay function ---------------------------------

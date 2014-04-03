@@ -54,6 +54,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 * [ov-prev](#ov-prev-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
 * [ov-goto-next](#ov-goto-next-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
 * [ov-goto-prev](#ov-goto-prev-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
+* [ov-keybind](#ov-keybind-ov-or-ovs-or-id-rest-keybinds) `(ov-or-ovs-or-id &rest keybinds)`
 
 <!-- * [ov-read-only](#ov-read-only-ov-or-ovs) `(ov-or-ovs)` -->
 <!-- * [ov-timeout](#ov-timeout-time-func-func-after) `(time func func-after)` -->
@@ -480,6 +481,33 @@ Move cursor to the previous overlay position. You can specify arguments the same
 (ov-goto-prev 300 'face 'warning)
 ```
 
+#### ov-keybind `(ov-or-ovs-or-id &rest keybinds)`
+
+Set `keybinds` to an overlay or overlays in a list.  
+If `ov-or-ovs-or-id` is any symbol, the `keybinds` will be enabled in the whole buffer, and it works even if new inputs inserting at the both edges of the buffer.
+
+```cl
+(setq ov1 (ov-match "ov-"))
+(ov-set ov1 'face 'warning 'my-ov1 t)
+(ov-keymap ov1
+  "M-n" '(if (ov-goto-next 'my-ov1) (backward-char 1))
+  "M-p" '(ov-goto-prev 'my-ov1))
+
+(setq ov2 (ov-line))
+(ov-set ov2 'face '(:box t))
+(ov-keymap ov2
+  "RET" '(let ((o (ov-at)))
+           (if (memq :box (ov-val o 'face))
+               (ov-set o 'face '(:underline t))
+             (ov-set o 'face '(:box t)))))
+
+;; Enable keybind to the whole buffer
+(ov-keymap 'my-ov-test1
+  "M-n" 'move-end-of-line
+  "M-p" 'move-beginning-of-line)
+(ov-clear 'my-ov-test1)
+```
+
 <!-- #### ov-read-only `(ov-or-ovs)` -->
 
 <!-- It implements a read-only like feature for overlay. It's not as good as that of the text property. -->
@@ -492,53 +520,6 @@ Move cursor to the previous overlay position. You can specify arguments the same
 <!-- ``` -->
 
 ## Useful examples
-
-#### Add keybinds specific to overlay area
-
-Assign keybind that works only where the cursor is on the overlays.
-
-```cl
-(defvar ov1-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-d") 'ov-clear)
-    (define-key map (kbd "M-b")
-      (lambda () (interactive) (ov-set (ov-at) 'face '(:box t))))
-    (define-key map (kbd "M-n")
-      (lambda () (interactive) (if (ov-goto-next 'ov1) (backward-char 1))))
-    (define-key map (kbd "M-p")
-      (lambda () (interactive) (ov-goto-prev 'ov1)))
-    map))
-(ov-set "key" 'face 'warning 'keymap ov1-map 'ov1 t)
-```
-
-#### Sticky overlay
-
-A sticky overlay will be inherited by inserting at the both sides of the one.
-
-```cl
-(let ((ov-sticky-front t)
-      (ov-sticky-rear t))
-  (ov-set "ov-[^\s]+" 'face 'warning))
-```
-
-#### Override/Replace buffer keybind
-
-Override or replace keybind on the buffer by 'local-map or 'keymap property.
-The two properties are a bit different. See: [Overlay Properties](http://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html)
-
-```cl
-(defun ov-test-message1 () (interactive) (message "aaa"))
-(defun ov-test-message2 () (interactive) (message "bbb"))
-;; Set keybinds the whole buffer
-(let ((map (make-sparse-keymap))
-      (ov-sticky-front t)
-      (ov-sticky-rear  t))
-  (define-key map (kbd "C-a") 'ov-test-message1)
-  (define-key map (kbd "M-a") 'ov-test-message2)
-  (ov (point-min) (point-max) 'local-map map 'my-keymap-test t))
-;; Delete keymap overlay
-(ov-clear 'my-keymap-test)
-```
 
 #### Evaporative overlay
 

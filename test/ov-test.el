@@ -230,5 +230,34 @@
                    (ov-goto-prev 100 'bbb t)
                    (ov-goto-prev 'bbb t)))))
 
+(ert-deftest ov-test/ov-keymap1 ()
+  (ov-test-insert-dammy-text)
+  (ov-keymap (ov-regexp "the") "C-n" 'ov-clear)
+  (should (eq 16 (length (ov-all))))
+  (ov-goto-next)
+  (execute-kbd-macro (kbd "C-n"))
+  (should (eq 0 (length (ov-all)))))
+
+(ert-deftest ov-test/ov-keymap2 ()
+  (ov-test-insert-dammy-text)
+  (forward-line 2)
+  (setq ov1 (ov-line))
+  (ov-set ov1 'face 'warning)
+  (ov-keymap ov1 "C-p" 'ov-clear)
+  (should (ov? ov1))
+  (should (eq (point-at-bol) (ov-beg ov1)))
+  (should (eq (point-at-eol) (1- (ov-end ov1))))
+  (execute-kbd-macro (kbd "C-p"))
+  (should (eq 0 (length (ov-all)))))
+
+(ert-deftest ov-test/ov-keymap3 ()
+  (ov-test-insert-dammy-text)
+  (ov-keymap 'ov-keymap-test
+    "C-n" '(ov-clear 'keymap)
+    "C-p" '(ov-clear 'keymap))
+  (should (ov? (ov-at)))
+  (execute-kbd-macro (kbd "C-p"))
+  (should-not (ov? (ov-at))))
+
 (provide 'ov-test)
 ;;; ov-test.el ends here
