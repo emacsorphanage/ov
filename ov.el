@@ -32,6 +32,9 @@
   "Group for ov.el"
   :prefix "ov-" :group 'development)
 
+(defvar ov-sticky-front nil)
+(defvar ov-sticky-rear nil)
+
 ;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Overlay-Properties.html
 (defvar ov-prop-list '(priority
                        window
@@ -57,6 +60,11 @@
                        keymap))
 
 ;; Make overlay / Set properties -----------------------------------------------
+;; Just make an overlay from `beg' and `end'.
+;; Alias                             ;; Argument
+(defalias 'ov-create  'make-overlay) ;; (beg end)
+(defalias 'ov-make    'make-overlay) ;; (beg end)
+
 (defun ov (beg end &rest properties)
   "Make an overlay from `beg' and `end', then set `properties` if it's specified."
   (if properties
@@ -64,22 +72,18 @@
         ;; To pass properties to `ov-set'
         (when (listp (car-safe properties))
           (setq properties (car properties)))
-        (let ((o (ov-make beg end nil t)))
+        (let ((o (ov-make beg end nil (not ov-sticky-front) ov-sticky-rear)))
           (ov-set o properties)
           o))
-    (make-overlay beg end)))
-
-;; Just make an overlay from `beg' and `end'.
-;; Alias                             ;; Argument
-(defalias 'ov-create  'make-overlay) ;; (beg end)
-(defalias 'ov-make    'make-overlay) ;; (beg end)
+    (ov-make beg end nil (not ov-sticky-front) ov-sticky-rear)))
 
 (defun ov-line (&optional point)
   "Make an overlay from the beginning of the line to the beginning of the next line, which include `point`."
   (let (o)
     (save-excursion
       (goto-char (or point (point)))
-      (setq o (ov-make (point-at-bol) (min (1+ (point-at-eol)) (point-max)) nil t)))
+      (setq o (ov-make (point-at-bol) (min (1+ (point-at-eol)) (point-max))
+                       nil (not ov-sticky-front) ov-sticky-rear)))
     o))
 
 (defun ov-match (string &optional beg end)
@@ -90,7 +94,8 @@
       (ov-recenter (point-max))
       (while (search-forward string end t)
         (setq ov-or-ovs (cons (ov-make (match-beginning 0)
-                                       (match-end 0) nil t)
+                                       (match-end 0)
+                                       nil (not ov-sticky-front) ov-sticky-rear)
                               ov-or-ovs)))
       ov-or-ovs)))
 
@@ -102,14 +107,16 @@
       (ov-recenter (point-max))
       (while (re-search-forward regexp end t)
         (setq ov-or-ovs (cons (ov-make (match-beginning 0)
-                                       (match-end 0) nil t)
+                                       (match-end 0)
+                                       nil (not ov-sticky-front) ov-sticky-rear)
                               ov-or-ovs)))
       ov-or-ovs)))
 
 (defun ov-region ()
   "Make an overlay from a region, when you make a region"
   (if mark-active
-      (let ((o (ov-make (region-beginning) (region-end) nil t)))
+      (let ((o (ov-make (region-beginning) (region-end)
+                        nil (not ov-sticky-front) ov-sticky-rear)))
         (deactivate-mark t)
         o)
     (error "Error: Need to make region")))

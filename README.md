@@ -17,7 +17,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 ### Make overlay / Set properties
 
 * [ov](#ov-beg-end-rest-properties) `(beg end &rest properties)`
-* [ov-make](#ov-make-beg-end-optional-buffer-front-nonsticky-rear-sticky) `(beg end)`
+* [ov-make](#ov-make-beg-end) `(beg end)`
 * [ov-line](#ov-line-optional-point) `(&optional point)`
 * [ov-match](#ov-match-string-optional-beg-end) `(string &optional beg end)`
 * [ov-regexp](#ov-regexp-regexp-optional-beg-end) `(regexp &optional beg end)`
@@ -79,7 +79,7 @@ Return: `overlay`
 
 You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 
-#### ov-make `(beg end &optional buffer front-advance rear-advance)`
+#### ov-make `(beg end)`
 
 Just make an overlay from `beg` and `end`.
 
@@ -89,11 +89,6 @@ Alias: `ov-create`
 ```cl
 (setq ov1 (ov-make 10 55))           ; => #<overlay from 10 to 55 in *scratch*>
 (setq ov2 (ov-make (point-min) 25))  ; => #<overlay from 1 to 25 in *scratch*>
-;; Third argument is buffer object. If it's ommited or nil, it will be current buffer object.
-(setq ov3 (ov-make 10 20 (get-buffer "README.md"))) ; => #<overlay from 10 to 20 in README.md>
-;; If fourth argument is t, overlay won't be inherited by inserting (like front-nonsticky in text-property).
-;; If fifth  argument is t, overlay will  be inherited by inserting (like rear-sticky in text-property).
-(setq ov4 (ov-make 15 30 nil t nil)) ; => #<overlay from 15 to 30 in *scratch*>
 ```
 
 #### ov-line `(&optional point)`
@@ -528,6 +523,15 @@ When you modify one of the overlaid text, all their overlays will be evaporated.
               'modification-hooks '(my-ov-evaporate-ov1))
 ```
 
+#### Sticky overlay
+
+A sticky overlay will be inherited by inserting at the both sides of the one.
+
+```
+(let ((ov-sticky-front t)
+      (ov-sticky-rear t))
+  (ov-set "ov-[^\s]+" 'face 'warning))
+```
 
 ## Reference
 
