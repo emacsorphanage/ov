@@ -50,10 +50,10 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 ### Overlay manipulation
 
 * [ov-move](#ov-move-ov-beg-end-optional-buffer) `(ov beg end &optional buffer)`
-* [ov-next](#ov-next-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
-* [ov-prev](#ov-prev-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
-* [ov-goto-next](#ov-goto-next-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
-* [ov-goto-prev](#ov-goto-prev-optional-point-or-prop-prop-or-point-val) `(&optional point property value)`
+* [ov-next](#ov-next-optional-point-or-prop-prop-or-point-val) `(&optional point-or-prop prop-or-point value)`
+* [ov-prev](#ov-prev-optional-point-or-prop-prop-or-point-val) `(&optional point-or-prop prop-or-point value)`
+* [ov-goto-next](#ov-goto-next-optional-point-or-prop-prop-or-point-val) `(&optional point-or-prop prop-or-point value)`
+* [ov-goto-prev](#ov-goto-prev-optional-point-or-prop-prop-or-point-val) `(&optional point-or-prop prop-or-point value)`
 * [ov-keymap](#ov-keymap-ov-or-ovs-or-id-rest-keybinds) `(ov-or-ovs-or-id &rest keybinds)`
 
 <!-- * [ov-read-only](#ov-read-only-ov-or-ovs) `(ov-or-ovs)` -->
@@ -521,12 +521,23 @@ If `ov-or-ovs-or-id` is any symbol, the `keybinds` will be enabled in the whole 
 
 ## Useful examples
 
-#### Evaporative overlay
+#### Sticky overlay
 
-When you modify one of the overlaid text, all their overlays will be evaporated.
+Sticky overlays will be inherited by inserting at both sides of each one.
 
 ```cl
-(defun my-ov-evaporate-ov1 (_ov _after _beg _end &optional _len)
+(let ((ov-sticky-front t)
+      (ov-sticky-rear t))
+  (ov-set "ov-[^\s]+" 'face 'warning))
+```
+
+#### Evaporative overlay
+
+When you modify one of the overlaid text, all their overlays will be evaporated.  
+`modification-hooks` requires function to specify 5 arguments.
+
+```cl
+(defun my-ov-evaporate-ov1 (_ov _after _beg _end &optional _length)
   (ov-clear 'ov1))
 (ov-set "ov-" 'face 'warning
               'ov1 t
