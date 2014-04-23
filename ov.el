@@ -434,7 +434,7 @@ and it works even if new inputs inserting at the both edges of the buffer."
     (overlay-put ov-save-comint-last-prompt-overlay
                  'modification-hooks nil)
     (overlay-put ov-save-comint-last-prompt-overlay
-                 'insert-in-front-hooks' nil))
+                 'insert-in-front-hooks nil))
   ad-do-it
   (when comint-last-prompt-overlay
     (setq ov-save-comint-last-prompt-overlay

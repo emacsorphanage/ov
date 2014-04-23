@@ -538,7 +538,8 @@ When you modify one of the overlaid text, all their overlays will be evaporated.
 
 ```cl
 (defun my-ov-evaporate-ov1 (_ov _after _beg _end &optional _length)
-  (ov-clear 'ov1))
+  (let ((inhibit-modification-hooks t))
+    (if _after (ov-clear 'ov1))))
 (ov-set "ov-" 'face 'warning
               'ov1 t
               'modification-hooks '(my-ov-evaporate-ov1))
