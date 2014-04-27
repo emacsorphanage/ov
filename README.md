@@ -5,7 +5,7 @@ Simple way to manipulate overlay for Emacs.
 
 ![ov.el](https://raw2.github.com/ShingoFukuyama/images/master/ov1.gif)
 
-Overlay is capable of manipulating text appearance, cursor behavior, etc.  
+Overlay is capable of manipulating text appearance, cursor behavior, etc.
 It doesn't affect font-lock or text-properties.
 
 ## Command
@@ -65,7 +65,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 
 #### ov `(beg end &rest properties)`
 
-Make an overlay from `beg` and `end`, then set `properties` if it's specified.
+Make an overlay from `beg` to `end`.  If `properties` are specified, set them for the created overlay.
 
 Return: `overlay`
 
@@ -84,7 +84,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 
 Just make an overlay from `beg` and `end`.
 
-Return: `overlay`  
+Return: `overlay`
 Alias: `ov-create`
 
 ```cl
@@ -104,7 +104,9 @@ Return: `overlay`
 
 #### ov-match `(string &optional beg end)`
 
-Make overlays that match the `string`. `beg` and `end` are specify the area.
+Make overlays spanning the regions that match `string`.
+
+If `beg` and `end` are numbers, they specify the bounds of the search.
 
 Return: `overlay list`
 
@@ -115,7 +117,9 @@ Return: `overlay list`
 
 #### ov-regexp `(regexp &optional beg end)`
 
-Make overlays that match the `regexp`. `beg` and `end` are specify the area.
+Make overlays spanning the regions that match `regexp`.
+
+If `beg` and `end` are numbers, they specify the bounds of the search.
 
 Return: `overlay list`
 
@@ -126,11 +130,17 @@ Return: `overlay list`
 
 #### ov-set `(ov-or-ovs-or-regexp &rest properties)`
 
-Set properties and values in an overlay or overlays alternately.  
-If `ov-or-ovs-or-regexp` is string, it use `ov-regexp` to make overlays.  
-If you want to use literal string, use `(ov-match "string")` instead.
+Set overlay properties and values.
+`ov-or-ovs-or-regexp` can be an overlay, overlays or a regexp.
 
-Return: `nil`  
+If an overlay or list of overlays, `properties` are set for these.
+
+If a regexp, first overlays are created on the matching regions (see
+`ov-regexp`), then the properties are set.
+
+If you want to use a literal string, use `(ov-match "string")` instead.
+
+Return: `nil`
 Alias: `ov-put`
 
 ```cl
@@ -149,7 +159,8 @@ Alias: `ov-put`
 
 #### ov-region
 
-Make an overlay from a region.  
+Make an overlay from a region if region is active.
+
 When you make a region, do `M-: (ov-set (ov-region) 'face '(:box t))`.
 
 Return: `overlay`
@@ -162,7 +173,19 @@ Return: `overlay`
 
 #### ov-clear `(&optional prop-or-beg val-or-end beg end)`
 
-Clear `beg` and `end` of overlays whose `property` has `value`.
+Clear overlays satisfying a condition.
+
+If `prop-or-beg` is a symbol, clear overlays with this property set to non-nil.
+
+If `val-or-end` is non-nil, the specified property's value should
+`equal` to this value.
+
+If both of these are numbers, clear the overlays between these points.
+
+If `beg` and `end` are numbers, clear the overlays with specified
+property and value between these points.
+
+With no arguments, clear all overlays in the buffer.
 
 Arguments pattern:
 
@@ -184,7 +207,12 @@ Arguments pattern:
 
 #### ov-reset `(ov-or-ovs-variable)`
 
-Clear overlays in `ov-or-ovs-variable`. The variable is going to be nil.
+Clear overlays in `ov-or-ovs-variable`.
+
+`ov-or-ovs-variable` should be a symbol whose value is an overlay
+or a list of overlays.
+
+Finally, the variable is set to nil.
 
 ```cl
 (setq ov1 (ov-line))
@@ -275,7 +303,7 @@ Return: `properties list`
 
 #### ov-spec `(ov-or-ovs)`
 
-Make a specification list from an overlay or overlay list.
+Make a specification list from an overlay or list of overlays.
 
 Return: `list ((beginning end buffer (properties)) (beginning end buffer (properties))...)` or `nil`
 
@@ -293,7 +321,8 @@ Return: `list ((beginning end buffer (properties)) (beginning end buffer (proper
 
 #### ov-at `(&optional point)`
 
-Get an overlay from `point` or when the cursor is at an existing overlay.
+Get an overlay at `point`.
+`point` defaults to the current `point`.
 
 Return: `overlay` or `nil`
 
@@ -306,7 +335,19 @@ Return: `overlay` or `nil`
 
 #### ov-in `(prop-or-val val-or-end beg end)`
 
-Get overlays within from `beg` to `end`.
+Get overlays satisfying a condition.
+
+If `prop-or-beg` is a symbol, get overlays with this property set to non-nil.
+
+If `val-or-end` is non-nil, the specified property's value should
+`equal` to this value.
+
+If both of these are numbers, get the overlays between these points.
+
+If `beg` and `end` are numbers, get the overlays with specified
+property and value between these points.
+
+With no arguments, get all overlays in the buffer.
 
 Return: `overlay list`
 
@@ -337,7 +378,7 @@ Arguments pattern:
 
 #### ov-all
 
-Get overlays in the whole buffer.
+Get all the overlays in the entire buffer.
 
 Return: `overlay list` or `nil`
 
@@ -347,7 +388,7 @@ Return: `overlay list` or `nil`
 
 #### ov-backwards `(&optional point)`
 
-Get overlays within from the beginning of the buffer to `point`.
+Get all the overlays from the beginning of the buffer to `point`.
 
 Return: `overlay list` or `nil`
 
@@ -358,7 +399,7 @@ Return: `overlay list` or `nil`
 
 #### ov-forwards `(&optional point)`
 
-Get overlays within from `point` to the end of the buffer.
+Get all the overlays from `point` to the end of the buffer.
 
 Return: `overlay list` or `nil`
 
@@ -403,9 +444,21 @@ Return: `overlay`
 <!-- (ov-timeout 1.2 ov-fn1 ov-fn2) -->
 <!-- ``` -->
 
-#### ov-next `(&optional point-or-prop prop-or-point val)`
+#### ov-next `(&optional point-or-prop prop-or-val val)`
 
-Get the next existing overlay from `point-or-prop`. You can also specify `prop-or-point` and its `val`.
+Get the next overlay satisfying a condition.
+
+If `point-or-prop` is a symbol, get the next overlay with this
+property being non-nil.
+
+If `prop-or-val` is non-nil, the property should have this value.
+
+If `point-or-prop` is a number, get the next overlay after this
+point.
+
+If `prop-or-val` and `val` are also specified, get the next overlay
+after `point-or-prop` having property `prop-or-val` set to `val` (with
+`val` unspecified, only the presence of property is tested).
 
 Return: `overlay`
 
@@ -431,9 +484,22 @@ Arguments pattern:
 (ov-next (point) 'aaa t)
 ```
 
-#### ov-prev `(&optional point-or-prop prop-or-point val)`
+#### ov-prev `(&optional point-or-prop prop-or-val val)`
 
-Get the previous existing overlay from `point`. You can also specify `property` and its `value`.
+Get the previous overlay satisfying a condition.
+
+If `point-or-prop` is a symbol, get the previous overlay with this
+property being non-nil.
+
+If `prop-or-val` is non-nil, the property should have this value.
+
+If `point-or-prop` is a number, get the previous overlay after this
+point.
+
+If `prop-or-val` and `val` are also specified, get the previous
+overlay after `point-or-prop` having property `prop-or-val` set to
+`val` (with `val` unspecified, only the presence of property is
+tested).
 
 Return: `overlay`
 
@@ -461,7 +527,8 @@ Arguments pattern:
 
 #### ov-goto-next `(&optional point-or-prop prop-or-point val)`
 
-Move cursor to the next overlay position. You can specify arguments the same as `ov-next` above.
+Move cursor to the end of the next overlay.
+The arguments are the same as for `ov-next`.
 
 ```cl
 (ov-goto-next)
@@ -472,7 +539,8 @@ Move cursor to the next overlay position. You can specify arguments the same as 
 
 #### ov-goto-prev `(&optional point-or-prop prop-or-point val)`
 
-Move cursor to the previous overlay position. You can specify arguments the same as `ov-prev` above.
+Move cursor to the beginning of previous overlay.
+The arguments are the same as for `ov-prev`.
 
 ```cl
 (ov-goto-prev)
@@ -483,8 +551,13 @@ Move cursor to the previous overlay position. You can specify arguments the same
 
 #### ov-keymap `(ov-or-ovs-or-id &rest keybinds)`
 
-Set `keybinds` to an overlay or overlays in a list.  
-If `ov-or-ovs-or-id` is any symbol, the `keybinds` will be enabled in the whole buffer, and it works even if new inputs inserting at the both edges of the buffer.
+Set `keybinds` to an overlay or a list of overlays.
+
+If `ov-or-ovs-or-id` is a symbol, the `keybinds` will be enabled for
+the entire buffer and the property represented by the symbol to `t`.
+
+The overlay is expanded if new inputs are inserted at the
+beginning or end of the buffer.
 
 ```cl
 (setq ov1 (ov-match "ov-"))
@@ -533,7 +606,7 @@ Sticky overlays will be inherited by inserting at both sides of each one.
 
 #### Evaporative overlay
 
-When you modify one of the overlaid text, all their overlays will be evaporated.  
+When you modify one of the overlaid text, all their overlays will be evaporated.
 `modification-hooks` requires function to specify 5 arguments.
 
 ```cl
@@ -547,7 +620,7 @@ When you modify one of the overlaid text, all their overlays will be evaporated.
 
 ## Contribute
 
-Add new features or improve functions is welcome!  
+Add new features or improve functions is welcome!
 
 #### Add new functions
 
