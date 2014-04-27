@@ -56,7 +56,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 * [ov-goto-prev](#ov-goto-prev-optional-point-or-prop-prop-or-point-val) `(&optional point-or-prop prop-or-point value)`
 * [ov-keymap](#ov-keymap-ov-or-ovs-or-id-rest-keybinds) `(ov-or-ovs-or-id &rest keybinds)`
 
-<!-- * [ov-read-only](#ov-read-only-ov-or-ovs) `(ov-or-ovs)` -->
+* [ov-read-only](#ov-read-only-ov-or-ovs) `(ov-or-ovs-optional-insert-in-front-insert-behind)`
 <!-- * [ov-timeout](#ov-timeout-time-func-func-after) `(time func func-after)` -->
 
 ## Make overlay / Set properties
@@ -581,16 +581,24 @@ beginning or end of the buffer.
 (ov-clear 'my-ov-test1)
 ```
 
-<!-- #### ov-read-only `(ov-or-ovs)` -->
+#### ov-read-only `(ov-or-ovs &optional insert-in-front insert-behind)`
 
-<!-- It implements a read-only like feature for overlay. It's not as good as that of the text property. -->
+Implement a read-only like feature for overlay or list of overlays.
 
-<!-- ```cl -->
-<!-- (setq ov1 (ov-match "setq")) -->
-<!-- (ov-set ov1 'face 'success) -->
-<!-- (ov-read-only ov1) -->
-<!-- ;; You will be able to prevent some commands from modifying "setq" strings. -->
-<!-- ``` -->
+If `insert-in-front` is non-nil, inserting in front of each overlay is prevented.
+
+If `insert-behind` is non-nil, inserting behind of each overlay is prevented.
+
+Note that it allows modifications from out of range of a read-only overlay.
+
+```cl
+(setq ov1 (ov-match "setq"))
+(ov-read-only ov1)
+
+;; Prevent inserting in front and behind of an overlay
+(setq ov2 (ov-regexp "^;;"))
+(ov-read-only ov2 t t)
+```
 
 ## Useful examples
 

@@ -480,60 +480,45 @@ beginning or end of the buffer."
 
 
 ;; Impliment pseudo read-only overlay function ---------------------------------
-(defun ov-read-only (ov-or-ovs)
+(defun ov-read-only (ov-or-ovs &optional insert-in-front insert-behind)
   "Implement a read-only like feature for overlay or list of overlays.
 
-Note that it is not as good as the one specified by text property."
+If INSERT-IN-FRONT is non-nil, inserting in front of each overlay is prevented.
+
+If INSERT-BEHIND is non-nil, inserting behind of each overlay is prevented.
+
+Note that it allows modifications from out of range of a read-only overlay."
   (or (listp ov-or-ovs) (setq ov-or-ovs (cons ov-or-ovs nil)))
-  (mapc (lambda (ov)
-          (overlay-put ov 'modification-hooks    '(ov--read-only))
-          (overlay-put ov 'insert-in-front-hooks '(ov--read-only)))
-        ov-or-ovs))
+  (cond ((not (and insert-in-front insert-behind))
+         (mapc (lambda (ov)
+                 (overlay-put ov 'modification-hooks '(ov--read-only)))
+               ov-or-ovs))
+        ((and insert-in-front insert-behind)
+         (mapc (lambda (ov)
+                 (overlay-put ov 'modification-hooks '(ov--read-only))
+                 (overlay-put ov 'insert-in-front-hooks '(ov--read-only))
+                 (overlay-put ov 'insert-behind-hooks '(ov--read-only)))
+               ov-or-ovs))
+        (insert-in-front
+         (mapc (lambda (ov)
+                 (overlay-put ov 'modification-hooks '(ov--read-only))
+                 (overlay-put ov 'insert-in-front-hooks '(ov--read-only)))
+               ov-or-ovs))
+        (t ;; Should be insert-behind
+         (mapc (lambda (ov)
+                 (overlay-put ov 'modification-hooks '(ov--read-only))
+                 (overlay-put ov 'insert-behind-hooks '(ov--read-only)))
+               ov-or-ovs))))
 
-;; http://lists.gnu.org/archive/html/emacs-devel/2002-08/msg00428.html
-(defvar ov-save-comint-last-prompt-overlay nil)
-(defun ov--read-only (overlay after start end &optional _len)
-  (if (and (not after)
-           (or (< (ov-beg overlay) start)
-               (> (ov-end overlay) end)))
-      (error "")))
-
-(defadvice comint-output-filter (around swap-read-only activate)
-  "Add a read-only equivalency to the last prompt overlay."
-  ;; Caution: in Emacs <~21.2, a new overlay gets created for each
-  ;; prompt... in later versions, text-properties for old prompts
-  ;; are used instead, and the original overlay is recycled.  In
-  ;; this case, we can advise snapshot-last-prompt to remove the
-  ;; read-only *text properties* (not the overlay properties).
-  ;; Here we test to ensure the prompt isn't in the same position as
-  ;; the process-mark before removing the read-only overlay stuff.
-  (when (and ov-save-comint-last-prompt-overlay
-             (not (equal
-                   (marker-position (process-mark (get-buffer-process
-                                                   (current-buffer))))
-                   (ov-end
-                    ov-save-comint-last-prompt-overlay))))
-    (overlay-put ov-save-comint-last-prompt-overlay
-                 'modification-hooks nil)
-    (overlay-put ov-save-comint-last-prompt-overlay
-                 'insert-in-front-hooks nil))
-  ad-do-it
-  (when comint-last-prompt-overlay
-    (setq ov-save-comint-last-prompt-overlay
-          comint-last-prompt-overlay)
-    (overlay-put comint-last-prompt-overlay 'intangible t)
-    (overlay-put comint-last-prompt-overlay 'modification-hooks
-                 '(idlwave-shell-comint-signal-read-only))
-    (overlay-put comint-last-prompt-overlay 'insert-in-front-hooks
-                 '(idlwave-shell-comint-signal-read-only))))
-
-(defadvice comint-snapshot-last-prompt (after remove-text-read-only activate)
-  "Remove the read-only text properties potentially set by snapshot."
-  (when comint-last-prompt-overlay
-    (remove-text-properties
-     (ov-beg comint-last-prompt-overlay)
-     (ov-end comint-last-prompt-overlay)
-     '(modification-hooks nil insert-in-front-hooks nil))))
+(defun ov--read-only (ov after beg end &optional _length)
+  (when (and (not (or after
+                      undo-in-progress
+                      (eq this-command 'undo)
+                      (eq this-command 'redo)))
+             ;; Modification within range of a text
+             (or (< (ov-beg ov) beg)
+                 (> (ov-end ov) end)))
+    (error "Text is read-only")))
 
 
 (provide 'ov)
