@@ -42,7 +42,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 ### Get an existing overlay or overlay list
 
 * [ov-at](#ov-at-optional-point) `(&optional point)`
-* [ov-in](#ov-in-prop-or-beg-val-or-end-beg-end) `(prop-or-beg val-or-end beg end)`
+* [ov-in](#ov-in-prop-or-val-val-or-end-beg-end) `(prop-or-beg val-or-end beg end)`
 * [ov-all](#ov-all)
 * [ov-backwards](#ov-backwards-optional-point) `(&optional point)`
 * [ov-forwards](#ov-forwards-optional-point) `(&optional point)`
@@ -50,14 +50,13 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 ### Overlay manipulation
 
 * [ov-move](#ov-move-ov-beg-end-optional-buffer) `(ov beg end &optional buffer)`
-* [ov-next](#ov-next-optional-point-or-prop-prop-or-point-val) `(&optional point-or-prop prop-or-point value)`
-* [ov-prev](#ov-prev-optional-point-or-prop-prop-or-point-val) `(&optional point-or-prop prop-or-point value)`
-* [ov-goto-next](#ov-goto-next-optional-point-or-prop-prop-or-point-val) `(&optional point-or-prop prop-or-point value)`
-* [ov-goto-prev](#ov-goto-prev-optional-point-or-prop-prop-or-point-val) `(&optional point-or-prop prop-or-point value)`
+* [ov-next](#ov-next-optional-point-or-prop-prop-or-val-val) `(&optional point-or-prop prop-or-point val)`
+* [ov-prev](#ov-prev-optional-point-or-prop-prop-or-val-val) `(&optional point-or-prop prop-or-point val)`
+* [ov-goto-next](#ov-goto-next-optional-point-or-prop-prop-or-point-val) `(&optional point-or-prop prop-or-point val)`
+* [ov-goto-prev](#ov-goto-prev-optional-point-or-prop-prop-or-point-val) `(&optional point-or-prop prop-or-point val)`
 * [ov-keymap](#ov-keymap-ov-or-ovs-or-id-rest-keybinds) `(ov-or-ovs-or-id &rest keybinds)`
+* [ov-read-only](#ov-read-only-ov-or-ovs-optional-insert-in-front-insert-behind) `(ov-or-ovs &optional insert-in-front insert-behind)`
 
-* [ov-read-only](#ov-read-only-ov-or-ovs) `(ov-or-ovs-optional-insert-in-front-insert-behind)`
-<!-- * [ov-timeout](#ov-timeout-time-func-func-after) `(time func func-after)` -->
 
 ## Make overlay / Set properties
 
