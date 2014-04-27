@@ -545,6 +545,20 @@ When you modify one of the overlaid text, all their overlays will be evaporated.
               'modification-hooks '(my-ov-evaporate-ov1))
 ```
 
+## Contribute
+
+Add new features or improve functions is welcome!  
+
+#### Add new functions
+
+It would be helpful if you follow:
+
+* "ov-" prefixed function name
+* Simpler function name is preferable. (e.g "beg" > "beginning", "prop" > "property")
+* Accept single overlay and multiple overlays in one argument, such as `ov-or-ovs` in existing functions
+* Write examples and documents in README.md
+* Write tests in /test/ov-test.el
+* Use spaces as the indent instead of tabs
 
 ## Reference
 
