@@ -66,7 +66,9 @@
 (defalias 'ov-make    'make-overlay) ;; (beg end)
 
 (defun ov (beg end &rest properties)
-  "Make an overlay from `beg' and `end', then set `properties` if it's specified."
+  "Make an overlay from BEG to END.
+
+If PROPERTIES are specified, set them for the created overlay."
   (if properties
       (progn
         ;; To pass properties to `ov-set'
@@ -78,7 +80,7 @@
     (ov-make beg end nil (not ov-sticky-front) ov-sticky-rear)))
 
 (defun ov-line (&optional point)
-  "Make an overlay from the beginning of the line to the beginning of the next line, which include `point`."
+  "Make an overlay from the beginning of the line to the beginning of the next line, which include POINT."
   (let (o)
     (save-excursion
       (goto-char (or point (point)))
@@ -87,7 +89,9 @@
     o))
 
 (defun ov-match (string &optional beg end)
-  "Make overlays that match the `string'. `beg' and `end' are specify the area."
+  "Make overlays spanning the regions that match STRING.
+
+If BEG and END are numbers, they specify the bounds of the search."
   (save-excursion
     (goto-char (or beg (point-min)))
     (let (ov-or-ovs)
@@ -100,7 +104,9 @@
       ov-or-ovs)))
 
 (defun ov-regexp (regexp &optional beg end)
-  "Make overlays that match the `regexp'. `beg' and `end' are specify the area."
+  "Make overlays spanning the regions that match REGEXP.
+
+If BEG and END are numbers, they specify the bounds of the search."
   (save-excursion
     (goto-char (or beg (point-min)))
     (let (ov-or-ovs)
@@ -113,7 +119,7 @@
       ov-or-ovs)))
 
 (defun ov-region ()
-  "Make an overlay from a region, when you make a region"
+  "Make an overlay from a region if region is active."
   (if mark-active
       (let ((o (ov-make (region-beginning) (region-end)
                         nil (not ov-sticky-front) ov-sticky-rear)))
@@ -122,7 +128,13 @@
     (error "Error: Need to make region")))
 
 (defun ov-set (ov-or-ovs-or-regexp &rest properties)
-  "Set properties and values in an overlay or overlays alternately."
+  "Set overlay properties and values.
+OV-OR-OVS-OR-REGEXP can be an overlay, overlays or a regexp.
+
+If an overlay or list of overlays, PROPERTIES are set for these.
+
+If a regexp, first overlays are created on the matching
+regions (see `ov-regexp'), then the properties are set."
   (when ov-or-ovs-or-regexp
     (unless (and ov-or-ovs-or-regexp properties)
       (error "Error: arguments are OV and PROPERTIES"))
@@ -149,7 +161,19 @@
 ;; Delete overlay --------------------------------------------------------------
 ;;;###autoload
 (cl-defun ov-clear (&optional prop-or-beg (val-or-end 'any) beg end)
-  "Clear `beg' and `end' of overlays whose `property' has `value'."
+  "Clear overlays satisfying a condition.
+
+If PROP-OR-BEG is a symbol, clear overlays with this property set to non-nil.
+
+If VAL-OR-END is non-nil, the specified property's value should
+`equal' to this value.
+
+If both of these are numbers, clear the overlays between these points.
+
+If BEG and END are numbers, clear the overlays with specified
+property and value between these points.
+
+With no arguments, clear all overlays in the buffer."
   (interactive)
   (cl-labels ((clear
                (con beg end)
@@ -185,7 +209,12 @@
   nil)
 
 (defmacro ov-reset (ov-or-ovs-variable)
-  "Clear overlays in `ov-or-ovs-variable'. The variable is going to be nil."
+  "Clear overlays in OV-OR-OVS-VARIABLE.
+
+OV-OR-OVS-VARIABLE should be a symbol whose value is an overlay
+or a list of overlays.
+
+Finally, the variable is set to nil."
   `(progn
      (mapc (lambda (ov)
              (delete-overlay ov))
@@ -210,7 +239,12 @@
 (defalias 'ov-prop 'overlay-properties) ;; (ov)
 
 (defun ov-spec (ov-or-ovs)
-  "Make a specification list from an overlay or overlay list."
+  "Make an overlay specification list.
+This is of the form:
+
+  (beginnig end buffer &rest properties).
+
+OV-OR-OVS should be an overlay or a list of overlays."
   (or (listp ov-or-ovs) (setq ov-or-ovs (cons ov-or-ovs nil)))
   (mapcar (lambda (ov)
             (list (ov-beg ov) (ov-end ov)
@@ -220,12 +254,26 @@
 
 ;; Get present overlay object --------------------------------------------------
 (defun ov-at (&optional point)
-  "Get an overlay from `point' or when the cursor is at an existing overlay."
+  "Get an overlay at POINT.
+POINT defaults to the current `point'."
   (or point (setq point (point)))
   (car (overlays-at point)))
 
 ;; Get overlays between `beg' and `end'.
 (cl-defun ov-in (&optional prop-or-beg (val-or-end 'any) beg end)
+  "Get overlays satisfying a condition.
+
+If PROP-OR-BEG is a symbol, get overlays with this property set to non-nil.
+
+If VAL-OR-END is non-nil, the specified property's value should
+`equal' to this value.
+
+If both of these are numbers, get the overlays between these points.
+
+If BEG and END are numbers, get the overlays with specified
+property and value between these points.
+
+With no arguments, get all overlays in the buffer."
   (cl-labels ((in (con beg end)
                   (delq nil
                         (mapcar
@@ -257,15 +305,15 @@
      (t nil))))
 
 (defun ov-all ()
-  "Get overlays in the whole buffer."
+  "Get all the overlays in the entire buffer."
   (overlays-in (point-min) (point-max)))
 
 (defun ov-backwards (&optional point)
-  "Get overlays within from the beginning of the buffer to `point'."
+  "Get all the overlays from the beginning of the buffer to POINT."
   (ov-in (point-min) (or point (point))))
 
 (defun ov-forwards (&optional point)
-  "Get overlays within from the buffer to `point' to the end of the buffer."
+  "Get all the overlays from POINT to the end of the buffer."
   (ov-in (or point (point)) (point-max)))
 
 
@@ -276,7 +324,7 @@
 (defalias 'ov-move     'move-overlay)     ;; (ov beg end &optional buffer)
 
 (defmacro ov-timeout (time func func-after)
-  "Execute `func-after' after `time' seconds passed since `func' done."
+  "Execute FUNC-AFTER after TIME seconds passed since FUNC finished."
   (declare (indent 1))
   (if (symbolp func-after)
       (run-with-timer time nil `(lambda () (funcall ',func-after)))
@@ -286,7 +334,19 @@
     (funcall (lambda () (eval func)))))
 
 (cl-defun ov-next (&optional point-or-prop prop-or-val (val 'any))
-  "Get the next existing overlay from `point-or-prop'. You can also specify `prop-or-val' and its `val'."
+  "Get the next overlay satisfying a condition.
+
+If POINT-OR-PROP is a symbol, get the next overlay with this
+property being non-nil.
+
+If PROP-OR-VAL is non-nil, the property should have this value.
+
+If POINT-OR-PROP is a number, get the next overlay after this
+point.
+
+If PROP-OR-VAL and VAL are also specified, get the next overlay
+after POINT-OR-PROP having property PROP-OR-VAL set to VAL (with
+VAL unspecified, only the presence of property is tested)."
   (cl-labels ((next
                (po pr va)
                (save-excursion
@@ -324,7 +384,20 @@
      (t nil))))
 
 (cl-defun ov-prev (&optional point-or-prop prop-or-val (val 'any))
-  "Get the previous existing overlay from `point-or-prop'. You can also specify `prop-or-val' and its `val'."
+  "Get the previous overlay satisfying a condition.
+
+If POINT-OR-PROP is a symbol, get the previous overlay with this
+property being non-nil.
+
+If PROP-OR-VAL is non-nil, the property should have this value.
+
+If POINT-OR-PROP is a number, get the previous overlay after this
+point.
+
+If PROP-OR-VAL and VAL are also specified, get the previous
+overlay after POINT-OR-PROP having property PROP-OR-VAL set to
+VAL (with VAL unspecified, only the presence of property is
+tested)."
   (cl-labels ((prev
                (po pr va)
                (save-excursion
@@ -360,21 +433,28 @@
      (t nil))))
 
 (cl-defun ov-goto-next (&optional point-or-prop prop-or-val (val 'any))
-  "Move cursor to the next overlay position. You can specify arguments the same as `ov-next'."
+  "Move cursor to the end of the next overlay.
+The arguments are the same as for `ov-next'."
   (interactive)
   (let ((o (ov-next point-or-prop prop-or-val val)))
     (if o (goto-char (ov-end o)))))
 
 (cl-defun ov-goto-prev (&optional point-or-prop prop-or-val (val 'any))
-  "Move cursor to the previous overlay position. You can specify arguments the same as `ov-prev'."
+  "Move cursor to the beginning of previous overlay.
+The arguments are the same as for `ov-prev'."
   (interactive)
   (let ((o (ov-prev point-or-prop prop-or-val val)))
     (if o (goto-char (ov-beg o)))))
 
 (defmacro ov-keymap (ov-or-ovs-or-id &rest keybinds)
-  "Set `keybinds' to an overlay or overlays in a list.
-If `ov-or-ovs-or-id' is any symbol, the `keybinds' will be enabled in the whole buffer,
-and it works even if new inputs inserting at the both edges of the buffer."
+  "Set KEYBINDS to an overlay or a list of overlays.
+
+If OV-OR-OVS-OR-ID is a symbol, the KEYBINDS will be enabled for
+the entire buffer and the property represented by the symbol to
+`t'.
+
+The overlay is expanded if new inputs are inserted at the
+beginning or end of the buffer."
   (declare (indent 1))
   `(let ((map (make-sparse-keymap))
          (keys (list ,@keybinds)))
@@ -401,7 +481,9 @@ and it works even if new inputs inserting at the both edges of the buffer."
 
 ;; Impliment pseudo read-only overlay function ---------------------------------
 (defun ov-read-only (ov-or-ovs)
-  "It implements a read-only like feature for overlay. It's not as good as that of the text property."
+  "Implement a read-only like feature for overlay or list of overlays.
+
+Note that it is not as good as the one specified by text property."
   (or (listp ov-or-ovs) (setq ov-or-ovs (cons ov-or-ovs nil)))
   (mapc (lambda (ov)
           (overlay-put ov 'modification-hooks    '(ov--read-only))
@@ -446,7 +528,7 @@ and it works even if new inputs inserting at the both edges of the buffer."
                  '(idlwave-shell-comint-signal-read-only))))
 
 (defadvice comint-snapshot-last-prompt (after remove-text-read-only activate)
-  "Remove the read-only text properties potentially set by snapshot"
+  "Remove the read-only text properties potentially set by snapshot."
   (when comint-last-prompt-overlay
     (remove-text-properties
      (ov-beg comint-last-prompt-overlay)
