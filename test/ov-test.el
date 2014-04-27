@@ -259,5 +259,23 @@
   (execute-kbd-macro (kbd "C-p"))
   (should-not (ov? (ov-at))))
 
+(ert-deftest ov-test/ov-read-only1 ()
+  (ov-test-insert-dammy-text)
+  (setq ov1 (ov-match "the"))
+  (ov-read-only ov1)
+  (re-search-forward "the" nil t 3)
+  (should-error (delete-backward-char 1))
+  (delete-region (point-min) (point-max))
+  (should (eq (point-min) (point-max))))
+
+(ert-deftest ov-test/ov-read-only2 ()
+  (ov-test-insert-dammy-text)
+  (setq ov1 (ov-match "the"))
+  (ov-read-only ov1 t t)
+  (re-search-forward "the" nil t 2)
+  (should-error (insert "a"))
+  (re-search-backward "the" nil t 1)
+  (should-error (insert "a")))
+
 (provide 'ov-test)
 ;;; ov-test.el ends here
