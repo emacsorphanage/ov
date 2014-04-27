@@ -125,7 +125,7 @@ If BEG and END are numbers, they specify the bounds of the search."
                         nil (not ov-sticky-front) ov-sticky-rear)))
         (deactivate-mark t)
         o)
-    (error "Error: Need to make region")))
+    (error "Need to make region")))
 
 (defun ov-set (ov-or-ovs-or-regexp &rest properties)
   "Set overlay properties and values.
@@ -137,7 +137,7 @@ If a regexp, first overlays are created on the matching
 regions (see `ov-regexp'), then the properties are set."
   (when ov-or-ovs-or-regexp
     (unless (and ov-or-ovs-or-regexp properties)
-      (error "Error: arguments are OV and PROPERTIES"))
+      (error "Arguments are OV and PROPERTIES"))
     (cond ((stringp ov-or-ovs-or-regexp)
            (setq ov-or-ovs-or-regexp (ov-regexp ov-or-ovs-or-regexp)))
           ((ov-p ov-or-ovs-or-regexp)
@@ -147,7 +147,7 @@ regions (see `ov-regexp'), then the properties are set."
     (let ((len (length properties))
           (i 0))
       (unless (eq (logand len 1) 0)
-        (error "Error: invalid properties pairs"))
+        (error "Invalid properties pairs"))
       (mapc (lambda (ov)
               (while (< i len)
                 (overlay-put ov (nth i properties) (nth (setq i (1+ i)) properties))
@@ -466,11 +466,11 @@ beginning or end of the buffer."
              (cl-typecase key
                (vector key)
                (string (kbd key))
-               (t (error "Error: invalid key")))
+               (t (error "Invalid key")))
              (cl-typecase fn
                (command fn)
                (cons `(lambda () (interactive) ,fn))
-               (t (error "Error: invalid function")))))))
+               (t (error "Invalid function")))))))
      (if (symbolp ,ov-or-ovs-or-id)
          (let ((ov-sticky-front t)
                (ov-sticky-rear  t))
