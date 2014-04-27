@@ -120,7 +120,7 @@ If BEG and END are numbers, they specify the bounds of the search."
 
 (defun ov-region ()
   "Make an overlay from a region if region is active."
-  (if mark-active
+  (if (use-region-p)
       (let ((o (ov-make (region-beginning) (region-end)
                         nil (not ov-sticky-front) ov-sticky-rear)))
         (deactivate-mark t)
