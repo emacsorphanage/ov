@@ -488,27 +488,22 @@ If INSERT-IN-FRONT is non-nil, inserting in front of each overlay is prevented.
 If INSERT-BEHIND is non-nil, inserting behind of each overlay is prevented.
 
 Note that it allows modifications from out of range of a read-only overlay."
-  (or (listp ov-or-ovs) (setq ov-or-ovs (cons ov-or-ovs nil)))
   (cond ((not (and insert-in-front insert-behind))
-         (mapc (lambda (ov)
-                 (overlay-put ov 'modification-hooks '(ov--read-only)))
-               ov-or-ovs))
+         (ov-set ov-or-ovs
+                 'modification-hooks '(ov--read-only)))
         ((and insert-in-front insert-behind)
-         (mapc (lambda (ov)
-                 (overlay-put ov 'modification-hooks '(ov--read-only))
-                 (overlay-put ov 'insert-in-front-hooks '(ov--read-only))
-                 (overlay-put ov 'insert-behind-hooks '(ov--read-only)))
-               ov-or-ovs))
+         (ov-set ov-or-ovs
+                 'modification-hooks '(ov--read-only)
+                 'insert-in-front-hooks '(ov--read-only)
+                 'insert-behind-hooks '(ov--read-only)))
         (insert-in-front
-         (mapc (lambda (ov)
-                 (overlay-put ov 'modification-hooks '(ov--read-only))
-                 (overlay-put ov 'insert-in-front-hooks '(ov--read-only)))
-               ov-or-ovs))
+         (ov-set ov-or-ovs
+                 'modification-hooks '(ov--read-only)
+                 'insert-in-front-hooks '(ov--read-only)))
         (t ;; Should be insert-behind
-         (mapc (lambda (ov)
-                 (overlay-put ov 'modification-hooks '(ov--read-only))
-                 (overlay-put ov 'insert-behind-hooks '(ov--read-only)))
-               ov-or-ovs))))
+         (ov-set ov-or-ovs
+                 'modification-hooks '(ov--read-only)
+                 'insert-behind-hooks '(ov--read-only)))))
 
 (defun ov--read-only (ov after beg end &optional _length)
   (when (and (not (or after
