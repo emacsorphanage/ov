@@ -56,6 +56,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 * [ov-goto-prev](#ov-goto-prev-optional-point-or-prop-prop-or-point-val) `(&optional point-or-prop prop-or-point val)`
 * [ov-keymap](#ov-keymap-ov-or-ovs-or-id-rest-keybinds) `(ov-or-ovs-or-id &rest keybinds)`
 * [ov-read-only](#ov-read-only-ov-or-ovs-optional-insert-in-front-insert-behind) `(ov-or-ovs &optional insert-in-front insert-behind)`
+* [ov-placeholder](#ov-placeholder-ov-or-ovs) `(ov-or-ovs)`
 
 
 ## Make overlay / Set properties
@@ -654,6 +655,10 @@ It would be helpful if you follow:
 * Write examples and documents in README.md
 * Write tests in /test/ov-test.el
 * Use spaces as the indent instead of tabs
+
+## Contributor
+
+* [Matus Goljer](https://github.com/Fuco1) contributed to overhaul documents, and a lot of suggestions.
 
 ## Reference
 

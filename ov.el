@@ -481,7 +481,7 @@ beginning or end of the buffer."
 
 ;; Impliment pseudo read-only overlay function ---------------------------------
 (defun ov-read-only (ov-or-ovs &optional insert-in-front insert-behind)
-  "Implement a read-only like feature for overlay or list of overlays.
+  "Implement a read-only like feature for an overlay or a list of overlays.
 
 If INSERT-IN-FRONT is non-nil, inserting in front of each overlay is prevented.
 
@@ -518,7 +518,7 @@ Note that it allows modifications from out of range of a read-only overlay."
 
 ;; Special overlay -------------------------------------------------------------
 (defun ov-placeholder (ov-or-ovs)
-  "Set a placeholder feature for overlay or list of overlays.
+  "Set a placeholder feature for an overlay or a list of overlays.
 
 Each overlay deletes its string and overlay, when it is modified."
   (ov-set ov-or-ovs
