@@ -599,6 +599,21 @@ Note that it allows modifications from out of range of a read-only overlay.
 (ov-read-only ov2 t t)
 ```
 
+#### ov-placeholder
+
+Set a placeholder feature for overlay or list of overlays.
+
+Each overlay deletes its string and overlay, when it is modified.
+
+```cl
+(ov-placeholder (ov-match "abcdefghijklmn"))
+
+;; Try to insert or delete chars below
+;; abcdefghijklmn
+;; abcdefghijklmn
+;; abcdefghijklmn
+```
+
 ## Useful examples
 
 #### Sticky overlay

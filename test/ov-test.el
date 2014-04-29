@@ -277,5 +277,18 @@
   (re-search-backward "the" nil t 1)
   (should-error (insert "a")))
 
+(ert-deftest ov-test/ov-placeholder ()
+  (insert "abcdefghijklmnopqrstuvwxyz")
+  (ov-placeholder (ov-match "ghijklmn"))
+  (re-search-backward "g" nil t)
+  (insert " ")
+  (should (equal (buffer-substring (point-at-bol) (point-at-eol))
+                 "abcdef opqrstuvwxyz"))
+  (ov-placeholder (ov-match "vwxy"))
+  (re-search-forward "v" nil t)
+  (delete-backward-char 1)
+  (should (equal (buffer-substring (point-at-bol) (point-at-eol))
+                 "abcdef opqrstuz")))
+
 (provide 'ov-test)
 ;;; ov-test.el ends here

@@ -516,5 +516,28 @@ Note that it allows modifications from out of range of a read-only overlay."
     (error "Text is read-only")))
 
 
+;; Special overlay -------------------------------------------------------------
+(defun ov-placeholder (ov-or-ovs)
+  "Set a placeholder feature for overlay or list of overlays.
+
+Each overlay deletes its string and overlay, when it is modified."
+  (ov-set ov-or-ovs
+          'evaporate t
+          'modification-hooks '(ov--placeholder)
+          'insert-in-front-hooks '(ov--placeholder)
+          'insert-behind-hooks '(ov--placeholder)))
+
+(defun ov--placeholder (ov after beg end &optional length)
+  (let ((inhibit-modification-hooks t))
+    (when (not (or undo-in-progress
+                   (eq this-command 'undo)
+                   (eq this-command 'redo)))
+      (cond ((and (not after) (eq beg end))
+             (delete-region (ov-beg ov) (ov-end ov)))
+            ((and after (> length 0))
+             (if (ov-beg ov)
+                 (delete-region (ov-beg ov) (ov-end ov))))))))
+
+
 (provide 'ov)
 ;;; ov.el ends here
