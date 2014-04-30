@@ -22,6 +22,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 * [ov-match](#ov-match-string-optional-beg-end) `(string &optional beg end)`
 * [ov-regexp](#ov-regexp-regexp-optional-beg-end) `(regexp &optional beg end)`
 * [ov-set](#ov-set-ov-or-ovs-or-regexp-rest-properties) `(ov-or-ovs-or-regexp &rest properties)`
+* [ov-insert](#ov-insert-any) `(any)`
 * [ov-region](#ov-region)
 
 ### Clear overlay
@@ -155,6 +156,16 @@ Alias: `ov-put`
 
 (ov-set (ov-line) 'before-string (propertize ">>> " 'face 'font-lock-warning-face))
 (ov-set (ov-line) `(before-string ,(propertize ">>> " 'face 'font-lock-warning-face)))
+```
+
+#### ov-insert `any`
+
+Insert `any` (string, number, list, etc) covered with an empty overlay.
+
+Return: `overlay`
+
+```cl
+(ov-set (ov-insert "Overlay1") 'face 'menu 'intangible t)
 ```
 
 #### ov-region
@@ -576,6 +587,8 @@ Return: `overlay list` or `entire buffer overlay`
                (ov-set o 'face '(:underline t))
              (ov-set o 'face '(:box t)))))
 
+(ov-keymap (ov-insert "{Press [C-t] here}") "C-t" 'describe-text-properties)
+
 ;; Enable keybind to the whole buffer
 (ov-keymap 'my-ov-test1
   "M-n" 'move-end-of-line
@@ -599,6 +612,8 @@ Return: `overlay list`
 (setq ov1 (ov-match "setq"))
 (ov-read-only ov1)
 
+(ov-read-only (ov-insert "ReadOnly"))
+
 ;; Prevent inserting in front and behind of an overlay
 (setq ov2 (ov-regexp "^;;"))
 (ov-read-only ov2 t t)
@@ -613,12 +628,10 @@ Each overlay deletes its string and overlay, when it is modified.
 Return: `overlay list`
 
 ```cl
-(ov-placeholder (ov-match "abcdefghijklmn"))
-
+(ov-placeholder (ov-match ";; Try to insert or delete chars below"))
 ;; Try to insert or delete chars below
-;; abcdefghijklmn
-;; abcdefghijklmn
-;; abcdefghijklmn
+
+(ov-placeholder (ov-insert "[Placeholder]"))
 ```
 
 ## Useful examples

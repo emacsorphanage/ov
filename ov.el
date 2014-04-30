@@ -155,6 +155,15 @@ regions (see `ov-regexp'), then the properties are set."
               (setq i 0))
             ov-or-ovs-or-regexp))))
 (defalias 'ov-put 'ov-set)
+
+(defun ov-insert (any)
+  "Insert ANY (string, number, list, etc) covered with an empty overlay."
+  (or (stringp any) (setq any (format "%s" any)))
+  (let* ((beg (point))
+         (len (length any))
+         (end (+ beg len)))
+    (insert any)
+    (ov-make beg end)))
 
 
 ;; Delete overlay --------------------------------------------------------------

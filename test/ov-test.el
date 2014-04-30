@@ -89,6 +89,14 @@
   (should (eq 8 (length (ov-all))))
   (ov-clear))
 
+(ert-deftest ov-test/ov-insert ()
+  (ov-test-insert-dammy-text)
+  (setq ov1 (ov-insert "test"))
+  (should (eq 1 (length (ov-all))))
+  (should (equal "test"
+                 (buffer-substring
+                  (ov-beg ov1) (ov-end ov1)))))
+
 (ert-deftest ov-test/ov-clear ()
   (ov-test-insert-dammy-text)
   (ov-set "the" 'face 'underline)
