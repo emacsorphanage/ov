@@ -446,7 +446,7 @@ The arguments are the same as for `ov-prev'."
   (let ((o (ov-prev point-or-prop prop-or-val val)))
     (if o (goto-char (ov-beg o)))))
 
-(defmacro ov-keymap (ov-or-ovs-or-id &rest keybinds)
+(defun ov-keymap (ov-or-ovs-or-id &rest keybinds)
   "Set KEYBINDS to an overlay or a list of overlays.
 
 If OV-OR-OVS-OR-ID is a symbol, the KEYBINDS will be enabled for
@@ -455,13 +455,11 @@ the entire buffer and the property represented by the symbol to
 
 The overlay is expanded if new inputs are inserted at the
 beginning or end of the buffer."
-  (declare (indent 1))
-  `(let ((map (make-sparse-keymap))
-         (keys (list ,@keybinds)))
-     (when (cl-evenp (length keys))
-       (while keys
-         (let ((key (pop keys))
-               (fn  (pop keys)))
+  (let ((map (make-sparse-keymap)))
+     (when (cl-evenp (length keybinds))
+       (while keybinds
+         (let ((key (pop keybinds))
+               (fn  (pop keybinds)))
            (define-key map
              (cl-typecase key
                (vector key)
@@ -471,11 +469,11 @@ beginning or end of the buffer."
                (command fn)
                (cons `(lambda () (interactive) ,fn))
                (t (error "Invalid function")))))))
-     (if (symbolp ,ov-or-ovs-or-id)
+     (if (symbolp ov-or-ovs-or-id)
          (let ((ov-sticky-front t)
                (ov-sticky-rear  t))
-           (ov (point-min) (point-max) 'local-map map ,ov-or-ovs-or-id t))
-       (ov-set ,ov-or-ovs-or-id 'local-map map))
+           (ov (point-min) (point-max) 'local-map map ov-or-ovs-or-id t))
+       (ov-set ov-or-ovs-or-id 'local-map map))
      nil))
 
 

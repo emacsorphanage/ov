@@ -233,7 +233,7 @@
 (ert-deftest ov-test/ov-keymap1 ()
   (ov-test-insert-dammy-text)
   (ov-keymap (ov-regexp "the") "C-n" 'ov-clear)
-  (should (eq 16 (length (ov-all))))
+  (should (eq 8 (length (ov-all))))
   (ov-goto-next)
   (execute-kbd-macro (kbd "C-n"))
   (should (eq 0 (length (ov-all)))))
