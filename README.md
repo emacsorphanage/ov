@@ -140,7 +140,7 @@ If a regexp, first overlays are created on the matching regions (see
 
 If you want to use a literal string, use `(ov-match "string")` instead.
 
-Return: `nil`
+Return: `overlay list`
 Alias: `ov-put`
 
 ```cl
@@ -559,6 +559,8 @@ the entire buffer and the property represented by the symbol to `t`.
 The overlay is expanded if new inputs are inserted at the
 beginning or end of the buffer.
 
+Return: `overlay list` or `entire buffer overlay`
+
 ```cl
 (setq ov1 (ov-match "ov-"))
 (ov-set ov1 'face 'warning 'my-ov1 t)
@@ -591,6 +593,8 @@ If `insert-behind` is non-nil, inserting behind of each overlay is prevented.
 
 Note that it allows modifications from out of range of a read-only overlay.
 
+Return: `overlay list`
+
 ```cl
 (setq ov1 (ov-match "setq"))
 (ov-read-only ov1)
@@ -605,6 +609,8 @@ Note that it allows modifications from out of range of a read-only overlay.
 Set a placeholder feature for overlay or list of overlays.
 
 Each overlay deletes its string and overlay, when it is modified.
+
+Return: `overlay list`
 
 ```cl
 (ov-placeholder (ov-match "abcdefghijklmn"))

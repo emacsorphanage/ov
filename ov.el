@@ -153,8 +153,7 @@ regions (see `ov-regexp'), then the properties are set."
                 (overlay-put ov (nth i properties) (nth (setq i (1+ i)) properties))
                 (setq i (1+ i)))
               (setq i 0))
-            ov-or-ovs-or-regexp)
-      nil)))
+            ov-or-ovs-or-regexp))))
 (defalias 'ov-put 'ov-set)
 
 
@@ -473,8 +472,7 @@ beginning or end of the buffer."
          (let ((ov-sticky-front t)
                (ov-sticky-rear  t))
            (ov (point-min) (point-max) 'local-map map ov-or-ovs-or-id t))
-       (ov-set ov-or-ovs-or-id 'local-map map))
-     nil))
+       (ov-set ov-or-ovs-or-id 'local-map map))))
 
 
 ;; Impliment pseudo read-only overlay function ---------------------------------
