@@ -163,7 +163,7 @@ regions (see `ov-regexp'), then the properties are set."
          (len (length any))
          (end (+ beg len)))
     (insert any)
-    (ov-make beg end)))
+    (ov-make beg end nil (not ov-sticky-front) ov-sticky-rear)))
 
 
 ;; Delete overlay --------------------------------------------------------------
