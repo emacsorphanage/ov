@@ -8,7 +8,7 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq -yy ${EMACS}-nox ${EMACS}-el
 env:
-  - EVM_EMACS=emacs-24
+  - EMACS=emacs-24
   - EMACS=emacs-snapshot
 script:
   - emacs --version
