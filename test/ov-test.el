@@ -22,7 +22,7 @@
 ;;; Code:
 
 
-(defun ov-test-insert-dammy-text ()
+(defun ov-test-insert-dummy-text ()
   (insert
    ";; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -37,21 +37,21 @@
 
 
 (ert-deftest ov-test/ov ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (should (ov? (ov 1 10 'face 'warning 'display "fff")))
   (should (ov? (ov 1 10 '(face 'success 'display "eee"))))
   (should (ov? (ov 1 10)))
   (should-error (ov 10)))
 
 (ert-deftest ov-test/ov-make ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (should (ov? (ov-make 2 5)))
   (should (ov? (ov-make (point-min) (point-max))))
   (should-error (ov-make))
   (should-error (ov-make 10)))
 
 (ert-deftest ov-test/ov-line ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (should (ov? (ov-line)))
   (should (ov? (ov-line (point-min))))
   (should (ov? (ov-line (point-max))))
@@ -59,7 +59,7 @@
   (should-error (ov-line "a")))
 
 (ert-deftest ov-test/ov-match ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (should (listp (ov-match "is")))
   (should (ov? (car (ov-match "t"))))
   (should-error (ov-match 'a))
@@ -67,7 +67,7 @@
   (should-error (ov-match)))
 
 (ert-deftest ov-test/ov-regexp ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (should (listp (ov-regexp "^;;")))
   (should (ov? (car (ov-regexp "^;;"))))
   (should-error (ov-regexp 'a))
@@ -75,22 +75,26 @@
   (should-error (ov-regexp)))
 
 (ert-deftest ov-test/ov-set ()
-  (ov-test-insert-dammy-text)
-  (should (ov? (car (ov-set (ov-line) 'face 'warning))))
+  (ov-test-insert-dummy-text)
+  (setq ov1 (ov-set (ov-line) 'face 'warning))
+  (should (ov? ov1))
   (should (eq 1 (length (ov-all))))
   (ov-clear)
-  (should (ov? (car (ov-set (ov-line) '(face warning)))))
+  (setq ov2 (ov-set (ov-line) '(face warning)))
+  (should (ov? ov2))
   (should (eq 1 (length (ov-all))))
   (ov-clear)
-  (should (ov? (car (ov-set (ov-match "the") '(face warning)))))
+  (setq ov3 (ov-set (ov-match "the") '(face warning)))
+  (should (ov? (car ov3)))
   (should (eq 8 (length (ov-all))))
   (ov-clear)
-  (should (ov? (car (ov-set "^;;" '(face warning)))))
+  (setq ov4 (ov-set "^;;" '(face warning)))
+  (should (ov? (car ov4)))
   (should (eq 8 (length (ov-all))))
   (ov-clear))
 
 (ert-deftest ov-test/ov-insert ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (setq ov1 (ov-insert "test"))
   (should (eq 1 (length (ov-all))))
   (should (equal "test"
@@ -98,7 +102,7 @@
                   (ov-beg ov1) (ov-end ov1)))))
 
 (ert-deftest ov-test/ov-clear ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (ov-set "the" 'face 'underline)
   (ov-clear)
   (should-not (ov-all))
@@ -115,7 +119,7 @@
   (should (< 2 (length (ov-all)))))
 
 (ert-deftest ov-test/ov-reset ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (setq ov1 10)
   (setq ov2 10)
   (setq ov1 (ov-make 1 10))
@@ -127,7 +131,7 @@
   (should-not ov2))
 
 (ert-deftest ov-test/ov-spec ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (setq ov1 (ov-line))
   (setq ov2 (ov-regexp "^;.+$"))
   (should (listp (ov-spec ov1)))
@@ -136,7 +140,7 @@
   (should (eq 4 (length (car (ov-spec ov2))))))
 
 (ert-deftest ov-test/ov-at ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (ov-set "the" 'face '(:overline t :foreground "#ff0000"))
   (re-search-forward "the" nil t 3)
   (should-not (ov? (ov-at))) ;; at the end of an overlay
@@ -148,7 +152,7 @@
   (should-not (ov? (ov-at))))
 
 (ert-deftest ov-test/ov-in ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (ov-set "the" 'face 'warning)
   (ov-set "it" 'face 'success)
   (ov-set "is" 'face 'underline 'aaa t)
@@ -158,7 +162,7 @@
   (should (eq 3 (length (ov-in 'face 'success 1 253)))))
 
 (ert-deftest ov-test/ov-timeout ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (ov-timeout 0.3
     '(ov-set "the" 'face 'warning)
     '(ov-clear 'face 'warning))
@@ -174,7 +178,7 @@
   )
 
 (ert-deftest ov-test/ov-next ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (ov-set "the" 'face 'success 'aaa t)
   (ov-set ".$" 'face 'warning 'bbb t)
   (should (eq (save-excursion (re-search-forward "the" nil t))
@@ -189,7 +193,7 @@
               (ov-end (ov-next 'bbb t)))))
 
 (ert-deftest ov-test/ov-prev ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (ov-set "the" 'face 'success 'aaa t)
   (ov-set "^;" 'face 'warning 'bbb t)
   (goto-char (point-max))
@@ -205,7 +209,7 @@
               (ov-beg (ov-prev 'bbb t)))))
 
 (ert-deftest ov-test/ov-goto-next ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (ov-set "the" 'face 'warning 'aaa t)
   (ov-set "is"  'face 'success 'bbb t)
   (should (eq 19 (save-excursion
@@ -222,7 +226,7 @@
                     (ov-goto-next 'bbb t)))))
 
 (ert-deftest ov-test/ov-goto-prev ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (ov-set "the" 'face 'warning 'aaa t)
   (ov-set "is"  'face 'success 'bbb t)
   (should (eq 363 (save-excursion
@@ -239,7 +243,7 @@
                    (ov-goto-prev 'bbb t)))))
 
 (ert-deftest ov-test/ov-keymap1 ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (setq ov1 (ov-keymap (ov-regexp "the") "C-n" 'ov-clear))
   (should (ov? (car ov1)))
   (should (eq 8 (length (ov-all))))
@@ -248,12 +252,12 @@
   (should (eq 0 (length (ov-all)))))
 
 (ert-deftest ov-test/ov-keymap2 ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (forward-line 2)
   (setq ov1 (ov-line))
   (ov-set ov1 'face 'warning)
   (setq ov2 (ov-keymap ov1 "C-p" 'ov-clear))
-  (should (ov? (car ov2)))
+  (should (ov? ov2))
   (should (ov? ov1))
   (should (eq (point-at-bol) (ov-beg ov1)))
   (should (eq (point-at-eol) (1- (ov-end ov1))))
@@ -261,7 +265,7 @@
   (should (eq 0 (length (ov-all)))))
 
 (ert-deftest ov-test/ov-keymap3 ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (setq ov1 (ov-keymap 'ov-keymap-test
                        "C-n" '(ov-clear 'keymap)
                        "C-p" '(ov-clear 'keymap)))
@@ -272,7 +276,7 @@
   (should-not (ov? (ov-at))))
 
 (ert-deftest ov-test/ov-read-only1 ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (setq ov1 (ov-match "the"))
   (setq ov2 (ov-read-only ov1))
   (should (ov? (car ov2)))
@@ -282,7 +286,7 @@
   (should (eq (point-min) (point-max))))
 
 (ert-deftest ov-test/ov-read-only2 ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (setq ov1 (ov-match "the"))
   (setq ov2 (ov-read-only ov1 t t))
   (should (ov? (car ov2)))
@@ -294,7 +298,7 @@
 (ert-deftest ov-test/ov-placeholder ()
   (insert "abcdefghijklmnopqrstuvwxyz")
   (setq ov1 (ov-placeholder (ov-match "ghijklmn")))
-  (should (ov? (car ov1)))
+  (should (ov? ov1))
   (re-search-backward "g" nil t)
   (insert " ")
   (should (equal (buffer-substring (point-at-bol) (point-at-eol))
@@ -306,7 +310,7 @@
                  "abcdef opqrstuz")))
 
 (ert-deftest ov-test/ov-length ()
-  (ov-test-insert-dammy-text)
+  (ov-test-insert-dummy-text)
   (should (= (ov-length (car (ov-match "the"))) 3))
   (ov-clear)
   (should (= (ov-length (car (ov-match "General"))) 7)))

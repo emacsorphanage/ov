@@ -142,7 +142,7 @@ If a regexp, first overlays are created on the matching regions (see
 
 If you want to use a literal string, use `(ov-match "string")` instead.
 
-Return: `overlay list`
+Return: `overlay` or `overlay list`, depending on `ov-or-ovs-or-regexp`
 Alias: `ov-put`
 
 ```cl
@@ -690,6 +690,12 @@ It would be helpful if you follow:
 ## Contributor
 
 * [Matus Goljer](https://github.com/Fuco1) contributed to overhaul documents, and a lot of suggestions.
+
+## Change
+
+###### 2014/06/05
+* Change return value type of `ov-set`
+* Add `ov-length` by Matus Goljer
 
 ## Reference
 
