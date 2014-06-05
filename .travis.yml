@@ -5,6 +5,7 @@ before_install:
   - export PATH="/home/travis/.evm/bin:$PATH"
   - evm install emacs-24.3-bin
   - evm install $EVM_EMACS --use --force
+  - curl -fsSkL https://raw.github.com/cask/cask/master/go | python
   - cask
   - EMACS=$(evm bin emacs-24.3-bin) make start-server
 env:
