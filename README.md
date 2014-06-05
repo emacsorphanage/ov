@@ -35,6 +35,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 * [ov-p](#ov-p-ov) `(ov)`
 * [ov-beg](#ov-beg-ov) `(ov)`
 * [ov-end](#ov-end-ov) `(ov)`
+* [ov-length](#ov-length-ov) `(ov)`
 * [ov-buf](#ov-buf-ov) `(ov)`
 * [ov-val](#ov-val-ov-property) `(ov property)`
 * [ov-prop](#ov-prop-ov) `(ov)`
@@ -273,6 +274,17 @@ Return: `point`
 ```cl
 (setq ov1 (ov-make 200 700))
 (ov-end ov1) ; => 700
+```
+
+#### ov-length `(ov)`
+
+Return the length of the region spanned by `overlay`.
+
+Return: `number`
+
+```cl
+(setq ov1 (ov-make 200 700))
+(ov-length ov1) ; => 500
 ```
 
 #### ov-buf `(ov)`

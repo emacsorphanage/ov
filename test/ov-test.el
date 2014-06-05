@@ -305,5 +305,12 @@
   (should (equal (buffer-substring (point-at-bol) (point-at-eol))
                  "abcdef opqrstuz")))
 
+(ert-deftest ov-test/ov-length ()
+  (ov-test-insert-dammy-text)
+  (should (= (ov-length (car (ov-match "the"))) 3))
+  (ov-clear)
+  (should (= (ov-length (car (ov-match "General"))) 7)))
+
+
 (provide 'ov-test)
 ;;; ov-test.el ends here

@@ -246,6 +246,10 @@ Finally, the variable is set to nil."
 ;; Get the properties from an overlay.
 (defalias 'ov-prop 'overlay-properties) ;; (ov)
 
+(defun ov-length (overlay)
+  "Return the length of the region spanned by OVERLAY."
+  (- (ov-end overlay) (ov-beg overlay)))
+
 (defun ov-spec (ov-or-ovs)
   "Make an overlay specification list.
 This is of the form:
