@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2014 by Shingo Fukuyama
 
-;; Version: 1.0
+;; Version: 1.0.3
 ;; Author: Shingo Fukuyama - http://fukuyama.co
 ;; URL: https://github.com/ShingoFukuyama/ov.el
 ;; Created: Mar 20 2014
@@ -495,8 +495,8 @@ beginning or end of the buffer."
      (if (symbolp ov-or-ovs-or-id)
          (let ((ov-sticky-front t)
                (ov-sticky-rear  t))
-           (ov (point-min) (point-max) 'local-map map ov-or-ovs-or-id t))
-       (ov-set ov-or-ovs-or-id 'local-map map))))
+           (ov (point-min) (point-max) 'keymap map ov-or-ovs-or-id t))
+       (ov-set ov-or-ovs-or-id 'keymap map))))
 
 
 ;; Impliment pseudo read-only overlay function ---------------------------------

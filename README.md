@@ -694,6 +694,8 @@ It would be helpful if you follow:
 ## Change
 
 ###### 2014/06/05
+* Change `ov-keymap`'s keymapping property from `local-map` to `keymap`. By doing so, override the buffer local keymap instead of totaly replacing it.
+###### 2014/06/05
 * Change return value type of `ov-set`
 * Add `ov-length` by Matus Goljer
 
