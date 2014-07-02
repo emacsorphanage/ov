@@ -59,6 +59,7 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 * [ov-keymap](#ov-keymap-ov-or-ovs-or-id-rest-keybinds) `(ov-or-ovs-or-id &rest keybinds)`
 * [ov-read-only](#ov-read-only-ov-or-ovs-optional-insert-in-front-insert-behind) `(ov-or-ovs &optional insert-in-front insert-behind)`
 * [ov-placeholder](#ov-placeholder-ov-or-ovs) `(ov-or-ovs)`
+* [ov-smear](#ov-smear-regexp-or-list-optional-match-end-base-color-color-range) `(regexp-or-list &optional match-end base-color color-range)`
 
 
 ## Make overlay / Set properties
@@ -606,6 +607,11 @@ Return: `overlay list` or `entire buffer overlay`
   "M-n" 'move-end-of-line
   "M-p" 'move-beginning-of-line)
 (ov-clear 'my-ov-test1)
+
+;; Multiple keybinds to a command
+(ov-keymap (ov-insert "HERE")
+ '("a" "b") '(message "[a] or [b] is pressed")
+ `(,(kbd "<mouse-1>") ,(kbd "M-c") "c") '(message "Clicked or [M-c] or c is pressed"))
 ```
 
 #### ov-read-only `(ov-or-ovs &optional insert-in-front insert-behind)`
@@ -645,6 +651,32 @@ Return: `overlay list`
 
 (ov-placeholder (ov-insert "[Placeholder]"))
 ```
+
+#### ov-smear `(regexp-or-list &optional match-end base-color color-range)`
+
+Set background color overlays to the current buffer.
+Each background color is randomly determined based on BASE-COLOR or the default background color.
+
+If REGEXP-OR-LIST is regexp
+   Set overlays between matches of a regexp.
+
+If REGEXP-OR-LIST is list
+   Set overlays between point pairs in a list.
+
+```cl
+;; List
+(ov-smear '((1 . 200) (200 . 450) (600 . 750)))
+
+;; Regexp
+(ov-smear "^;;" nil "#ff0000" 60)
+(ov-smear "\n\n" t) ;; 2 returns and use match-end
+(ov-smear "^#")     ;; for markdown-mode
+(ov-smear "^\\*")   ;; for org-mode
+;; for objc-mode
+(ov-smear "^@\\(interface\\|implementation\\|end\\)\\|^#pragma")
+```
+
+![ov-smear](https://raw2.github.com/ShingoFukuyama/images/master/ov-smear.png)
 
 ## Useful examples
 
@@ -693,6 +725,8 @@ It would be helpful if you follow:
 
 ## Change
 
+###### 2014/07/02
+* Add [ov-smear](#ov-smear)
 ###### 2014/06/05
 * Change `ov-keymap`'s keymapping property from `local-map` to `keymap`. By doing so, override the buffer local keymap instead of totaly replacing it.
 ###### 2014/06/05

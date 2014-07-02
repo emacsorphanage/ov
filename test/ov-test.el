@@ -21,6 +21,7 @@
 
 ;;; Code:
 
+;; (ov-smear "\n\n" t)
 
 (defun ov-test-insert-dummy-text ()
   (insert
@@ -316,6 +317,27 @@
   (should (= (ov-length (car (ov-match "the"))) 3))
   (ov-clear)
   (should (= (ov-length (car (ov-match "General"))) 7)))
+
+(ert-deftest ov-test/ov--parse-hex-color ()
+  (should (equal (ov--parse-hex-color "#332cfa") '(51 44 250)))
+  (should (equal (ov--parse-hex-color "#332") '(51 51 34)))
+  (should (equal (ov--parse-hex-color "#FEB") '(255 238 187)))
+  (should-not (ov--parse-hex-color "#afs932"))
+  (should-not (ov--parse-hex-color "#Bfs")))
+
+(ert-deftest ov-test/ov--random-color ()
+  (should (string-match "\\#[0-9a-fA-F]\\{6\\}" (ov--random-color)))
+  (should (string-match "\\#[0-9a-fA-F]\\{6\\}" (ov--random-color "#33f")))
+  (should (string-match "\\#[0-9a-fA-F]\\{6\\}" (ov--random-color "#fff000" 50))))
+
+(ert-deftest ov-test/ov-smear ()
+  (ov-test-insert-dummy-text)
+  (should (ov? (car (ov-smear "this" t "red" 70))))
+  (should (eq 1 (length (ov-in))))
+  (should (ov? (car (ov-smear "the"))))
+  (should (eq 7 (length (ov-in)))))
+
+;; (ov-smear "\n\n" t)
 
 
 (provide 'ov-test)

@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2014 by Shingo Fukuyama
 
-;; Version: 1.0.3
+;; Version: 1.0.5
 ;; Author: Shingo Fukuyama - http://fukuyama.co
 ;; URL: https://github.com/ShingoFukuyama/ov.el
 ;; Created: Mar 20 2014
@@ -479,24 +479,28 @@ the entire buffer and the property represented by the symbol to
 The overlay is expanded if new inputs are inserted at the
 beginning or end of the buffer."
   (let ((map (make-sparse-keymap)))
-     (when (cl-evenp (length keybinds))
-       (while keybinds
-         (let ((key (pop keybinds))
-               (fn  (pop keybinds)))
-           (define-key map
-             (cl-typecase key
-               (vector key)
-               (string (kbd key))
-               (t (error "Invalid key")))
-             (cl-typecase fn
-               (command fn)
-               (cons `(lambda () (interactive) ,fn))
-               (t (error "Invalid function")))))))
-     (if (symbolp ov-or-ovs-or-id)
-         (let ((ov-sticky-front t)
-               (ov-sticky-rear  t))
-           (ov (point-min) (point-max) 'keymap map ov-or-ovs-or-id t))
-       (ov-set ov-or-ovs-or-id 'keymap map))))
+    (when (cl-evenp (length keybinds))
+      (while keybinds
+        (let* ((key (pop keybinds))
+               (fn  (pop keybinds))
+               (command (cl-typecase fn
+                          (command fn)
+                          (cons `(lambda () (interactive) ,fn))
+                          (t (error "Invalid function")))))
+          (cl-typecase key
+            (vector (define-key map key command))
+            (string (define-key map (kbd key) command))
+            (list   (mapc (lambda (k)
+                            (define-key map (cl-typecase k
+                                              (vector k)
+                                              (string (kbd k))) command))
+                          key))
+            (t (error "Invalid key"))))))
+    (if (symbolp ov-or-ovs-or-id)
+        (let ((ov-sticky-front t)
+              (ov-sticky-rear  t))
+          (ov (point-min) (point-max) 'keymap map ov-or-ovs-or-id t))
+      (ov-set ov-or-ovs-or-id 'keymap map))))
 
 
 ;; Impliment pseudo read-only overlay function ---------------------------------
@@ -557,6 +561,116 @@ Each overlay deletes its string and overlay, when it is modified."
             ((and after (> length 0))
              (if (ov-beg ov)
                  (delete-region (ov-beg ov) (ov-end ov))))))))
+
+
+;; Smear background ------------------------------------------------------------
+(defun ov--parse-hex-color (hex)
+  "Convert a hex color code to a RGB list.
+i.e.
+#99ccff => (153 204 255)
+#33a    => (51 51 170)"
+  (let (result)
+
+    (when (string-match
+           "^\\s-*\\#\\([0-9a-fA-F]\\)\\([0-9a-fA-F]\\)\\([0-9a-fA-F]\\)\\s-*$"
+           hex)
+      (let ((m1 (match-string 1 hex))
+            (m2 (match-string 2 hex))
+            (m3 (match-string 3 hex)))
+        (setq result (list (read (format "#x%s%s" m1 m1))
+                           (read (format "#x%s%s" m2 m2))
+                           (read (format "#x%s%s" m3 m3))))))
+    (when (string-match
+           "^\\s-*\\#\\([0-9a-fA-F]\\{2\\}\\)\\([0-9a-fA-F]\\{2\\}\\)\\([0-9a-fA-F]\\{2\\}\\)\\s-*$"
+           hex)
+      (setq result (list (read (format "#x%s" (match-string 1 hex)))
+                         (read (format "#x%s" (match-string 2 hex)))
+                         (read (format "#x%s" (match-string 3 hex))))))
+    result))
+
+(defun ov--random-color (&optional base-color range)
+  "Generate random color based on BASE-COLOR and RANGE.
+Default background color is used when BASE-COLOR is nil."
+  (or range (setq range 40))
+  (let ((default-background-color (ignore-errors (face-attribute 'default :background))))
+    (or base-color
+        (setq base-color
+              (cond ((eq 'unspecified default-background-color)
+                     "#fff")
+                    ((string-match "^#[0-9a-fA-F]\\{3,6\\}" default-background-color)
+                     default-background-color)
+                    ((color-name-to-rgb default-background-color) ;; yellow, LightBlue, etc...
+                     default-background-color)
+                    (t "#fff")))))
+  (if (color-name-to-rgb base-color)
+      (let ((rgb) (hex "#"))
+        (mapc (lambda (x)
+                (setq rgb (cons (round (* x 255)) rgb)))
+              (color-name-to-rgb base-color))
+        (setq rgb (nreverse rgb))
+        (mapcar (lambda (x)
+                  (setq hex (concat hex (format "%02x" x))))
+                rgb)
+        (setq base-color hex)))
+  (let* ((rgb (ov--parse-hex-color base-color))
+         ($half (/ range 2))
+         (fn (lambda (n)
+               (let (($base (- (nth n rgb) $half))
+                     ($min range)
+                     ($max (- 255 range)))
+                 (if (< $base $min) (setq $base (- $min $base)))
+                 (if (> $base $max) (setq $base $max))
+                 $base)))
+         (r (funcall fn 0))
+         (g (funcall fn 1))
+         (b (funcall fn 2)))
+    (format "#%02x%02x%02x"
+            (+ (cl-random range) r)
+            (+ (cl-random range) g)
+            (+ (cl-random range) b))))
+
+(defun ov-smear (regexp-or-list &optional match-end base-color color-range)
+  "Set background color overlays to the current buffer.
+Each background color is randomly determined based on BASE-COLOR
+or  the default background color.
+
+If REGEXP-OR-LIST is regexp
+   Set overlays between matches of a regexp.
+If REGEXP-OR-LIST is list
+   Set overlays between point pairs in a list.
+   i.e. (ov-smear '((1 . 30) (30 . 90))) "
+  (interactive "sSplitter: ")
+  (ov-clear 'ov-smear)
+  (let (points area length (counter 0) ov-list)
+    (cl-typecase regexp-or-list
+      (string (save-excursion
+                (goto-char (point-min))
+                (while (re-search-forward regexp-or-list nil t)
+                  (setq points (cons
+                                (if match-end
+                                    (match-end 0)
+                                  (match-beginning 0))
+                                points))))
+              (setq points (nreverse points))
+              (setq length (length points))
+              (while (< counter (1- length))
+                (setq area (cons
+                            (cons
+                             (nth counter points)
+                             (nth (1+ counter) points))
+                            area))
+                (setq counter (1+ counter))))
+      (list (setq area regexp-or-list)))
+    (mapc (lambda (a)
+            (let ((ov (ov (car a) (cdr a))))
+              (ov-set ov
+                      'face `(:background ,(ov--random-color base-color color-range))
+                      'ov-smear t)
+              (setq ov-list (cons ov ov-list))))
+          area)
+    ov-list))
+
+
 
 
 (provide 'ov)
