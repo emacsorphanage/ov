@@ -75,6 +75,12 @@
   (should-error (ov-regexp 1))
   (should-error (ov-regexp)))
 
+;; https://github.com/ShingoFukuyama/ov.el/issues/8
+(ert-deftest ov-test/ov-regexp-zero-width-match ()
+  "Not infinite loop with zero width match such as `$'"
+  (ov-test-insert-dummy-text)
+  (should (listp (ov-regexp "$"))))
+
 (ert-deftest ov-test/ov-set ()
   (ov-test-insert-dummy-text)
   (setq ov1 (ov-set (ov-line) 'face 'warning))

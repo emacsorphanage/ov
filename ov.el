@@ -109,13 +109,17 @@ If BEG and END are numbers, they specify the bounds of the search."
 If BEG and END are numbers, they specify the bounds of the search."
   (save-excursion
     (goto-char (or beg (point-min)))
-    (let (ov-or-ovs)
+    (let (ov-or-ovs finish)
       (ov-recenter (point-max))
-      (while (re-search-forward regexp end t)
+      (while (and (not finish) (re-search-forward regexp end t))
         (setq ov-or-ovs (cons (ov-make (match-beginning 0)
                                        (match-end 0)
                                        nil (not ov-sticky-front) ov-sticky-rear)
-                              ov-or-ovs)))
+                              ov-or-ovs))
+        (when (= (match-beginning 0) (match-end 0))
+          (if (eobp)
+              (setq finish t)
+            (forward-char 1))))
       ov-or-ovs)))
 
 (defun ov-region ()
