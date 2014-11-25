@@ -3,7 +3,7 @@
 
 Simple way to manipulate overlay for Emacs.
 
-![ov.el](https://raw2.github.com/ShingoFukuyama/images/master/ov1.gif)
+![ov.el](https://raw.githubusercontent.com/ShingoFukuyama/images/master/ov1.gif)
 
 Overlay is capable of manipulating text appearance, cursor behavior, etc.
 It doesn't affect font-lock or text-properties.
@@ -676,7 +676,7 @@ If REGEXP-OR-LIST is list
 (ov-smear "^@\\(interface\\|implementation\\|end\\)\\|^#pragma")
 ```
 
-![ov-smear](https://raw2.github.com/ShingoFukuyama/images/master/ov-smear.png)
+![ov-smear](https://raw.githubusercontent.com/ShingoFukuyama/images/master/ov-smear.png)
 
 ## Useful examples
 
