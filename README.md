@@ -1,5 +1,5 @@
 
-# ov.el [![Build Status](https://travis-ci.org/ShingoFukuyama/ov.el.svg?branch=master)](https://travis-ci.org/ShingoFukuyama/ov.el)
+# ov.el [![Build Status](https://travis-ci.org/ShingoFukuyama/ov.el.svg?branch=master)](https://travis-ci.org/ShingoFukuyama/ov.el) [![melpa badge][melpa-badge]][melpa-link] [![melpa stable badge][melpa-stable-badge]][melpa-stable-link]
 
 Simple way to manipulate overlay for Emacs.
 
@@ -739,3 +739,10 @@ It would be helpful if you follow:
 * :link: [Face Attributes](http://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html)
 * :link: [Managing Overlays](http://www.gnu.org/software/emacs/manual/html_node/elisp/Managing-Overlays.html)
 * :link: [comint read-only prompt](http://lists.gnu.org/archive/html/emacs-devel/2002-08/msg00428.html)
+
+
+
+[melpa-link]: http://melpa.org/#/ov
+[melpa-stable-link]: http://stable.melpa.org/#/ov
+[melpa-badge]: http://melpa.org/packages/ov-badge.svg
+[melpa-stable-badge]: http://stable.melpa.org/packages/ov-badge.svg

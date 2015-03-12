@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2014 by Shingo Fukuyama
 
-;; Version: 1.0.5
+;; Version: 1.0.6
 ;; Author: Shingo Fukuyama - http://fukuyama.co
 ;; URL: https://github.com/ShingoFukuyama/ov.el
 ;; Created: Mar 20 2014
