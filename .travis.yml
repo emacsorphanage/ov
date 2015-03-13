@@ -9,7 +9,7 @@ before_install:
   - sudo apt-get install -qq -yy ${EMACS}-nox ${EMACS}-el
 env:
   - EMACS=emacs24
-  - EMACS=emacs-snapshot
+  #- EMACS=emacs-snapshot
 script:
   - emacs --version
   - $EMACS -batch -l ov.el -l test/ov-test.el -f ert-run-tests-batch-and-exit
