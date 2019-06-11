@@ -506,6 +506,23 @@ beginning or end of the buffer."
           (ov (point-min) (point-max) 'keymap map ov-or-ovs-or-id t))
       (ov-set ov-or-ovs-or-id 'keymap map))))
 
+;; make/set overlays here functions --------------------------------------------
+
+(defun ov-here (point &rest properties)
+  "Make an overlay on POINT with PROPERTIES.  see `ov'."
+  (apply #'ov `(,point ,point ,@properties)))
+
+(defalias 'ov-create-here 'ov-make-here)
+(defun ov-make-here (point)
+  "Create a new overlay at POINT and return it.  see `ov-make'."
+  (apply #'ov-make `(,point ,point)))
+
+(defun ov-move-here (ov point &optional buffer shrink)
+  "Set the endpoints of OV to POINTin BUFFER.  see `ov-move'.
+If SHRINK is non-nil, OV will shrink 0 width."
+  (apply #'ov-move
+         `(,ov ,point ,(if shrink point (+ point (ov-length ov))) ,buffer)))
+
 
 ;; Impliment pseudo read-only overlay function ---------------------------------
 (defun ov-read-only (ov-or-ovs &optional insert-in-front insert-behind)
