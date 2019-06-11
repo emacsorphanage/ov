@@ -61,6 +61,12 @@ You can always do `M-x ov-clear` to clear all overlays in the current buffer.
 * [ov-placeholder](#ov-placeholder-ov-or-ovs) `(ov-or-ovs)`
 * [ov-smear](#ov-smear-regexp-or-list-optional-match-end-base-color-color-range) `(regexp-or-list &optional match-end base-color color-range)`
 
+### Make/Move here overlay
+
+* [ov-here](#ov-here-point-resr-properties) `(point &rest properties)`
+* [ov-make-here](#ov-make-here-point) `(point)`
+* [ov-move-here](#ov-move-here-ov-point-optional-buffer-shrink) `(ov point &optional buffer shrink)`
+
 
 ## Make overlay / Set properties
 
@@ -677,6 +683,47 @@ If REGEXP-OR-LIST is list
 ```
 
 ![ov-smear](https://raw.githubusercontent.com/ShingoFukuyama/images/master/ov-smear.png)
+
+### Make/Move here overlay
+
+Make/Move here overlay functions.
+Those functions recieve one `point` argument and pass regular `ov` functions as 0 width region.
+
+#### ov-here `(point &rest properties)`
+
+Make 0 width overlay (with properties).
+This overlay is useful for displaying overlay text that is simply not inserted into the buffer.
+
+```cl
+(ov-here (point-min)
+         'after-string
+         (propertize ">>>" 'face 'font-lock-warning-face))
+```
+
+#### ov-make-here `(point)`
+
+Make 0 width overlay.
+This overlay is useful for displaying overlay text that is simply not inserted into the buffer.
+
+```cl
+(setq ov1 (ov-make-here (point-min)))
+(ov-set ov1
+        'after-string
+        (propertize ">>>" 'face 'font-lock-warning-face))
+```
+
+#### ov-move-here `(ov point &optional buffer shrink)`
+
+Move overlay to `point` (at `buffer`).
+If `shrink` is non-nil, shrink overlay to 0 width.
+
+```cl
+(setq ov1 (ov-make-here (point-min)))
+(ov-set ov1
+        'after-string
+        (propertize ">>>" 'face 'font-lock-warning-face))
+(ov-move-here ov1 10)
+```
 
 ## Useful examples
 
