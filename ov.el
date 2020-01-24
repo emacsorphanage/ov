@@ -146,7 +146,7 @@ regions (see `ov-regexp'), then the properties are set."
       (setq properties (car properties)))
     (let ((len (length properties))
           (i 0)
-          return-value return-type)
+          return-type)
       (cond ((stringp ov-or-ovs-or-regexp)
              (setq ov-or-ovs-or-regexp (ov-regexp ov-or-ovs-or-regexp))
              (setq return-type 'ov-list))
@@ -157,18 +157,17 @@ regions (see `ov-regexp'), then the properties are set."
              (setq return-type 'ov-list)))
       (unless (eq (logand len 1) 0)
         (error "Invalid properties pairs"))
-      (setq return-value
-            (mapc (lambda (ov)
-                    (while (< i len)
-                      (overlay-put
-                       ov
-                       (nth i properties) (nth (setq i (1+ i)) properties))
-                      (setq i (1+ i)))
-                    (setq i 0))
-                  ov-or-ovs-or-regexp))
+      (mapc (lambda (ov)
+              (while (< i len)
+                (overlay-put
+                 ov
+                 (nth i properties) (nth (setq i (1+ i)) properties))
+                (setq i (1+ i)))
+              (setq i 0))
+            ov-or-ovs-or-regexp)
       (if (eq 'ov return-type)
-          (car return-value)
-        return-value))))
+          (car ov-or-ovs-or-regexp)
+        ov-or-ovs-or-regexp))))
 (defalias 'ov-put 'ov-set)
 
 (defun ov-insert (any)
