@@ -1,4 +1,4 @@
-;;; ov.el --- Overlay library for Emacs Lisp  -*- lexical-binding: t -*-
+;;; ov.el --- Overlay library for Emacs Lisp -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014 by Shingo Fukuyama
 
@@ -507,13 +507,15 @@ beginning or end of the buffer."
 
 ;; Implement pseudo read-only overlay function ---------------------------------
 (defun ov-read-only (ov-or-ovs &optional insert-in-front insert-behind)
-  "Implement a read-only like feature for OV-OR-OVS or a list of overlays.
+  "Implement a read-only like feature for an overlay or a list of overlays.
 
 If INSERT-IN-FRONT is non-nil, inserting in front of each overlay is prevented.
 
 If INSERT-BEHIND is non-nil, inserting behind of each overlay is prevented.
 
-Note that it allows modifications from out of range of a read-only overlay."
+Note that it allows modifications from out of range of a read-only overlay.
+
+OV-OR-OVS can be an overlay or list of overlay."
   (cond ((not (and insert-in-front insert-behind))
          (ov-set ov-or-ovs
                  'modification-hooks '(ov--read-only)))
@@ -532,8 +534,6 @@ Note that it allows modifications from out of range of a read-only overlay."
                  'insert-behind-hooks '(ov--read-only)))))
 
 (defun ov--read-only (ov after beg end &optional _length)
-  "Modification-hook for read only overlay.
-Called this function with 5 argument; OV, AFTER, BEG, END, _LENGTH."
   (when (and (not (or after
                       undo-in-progress
                       (eq this-command 'undo)
@@ -546,9 +546,11 @@ Called this function with 5 argument; OV, AFTER, BEG, END, _LENGTH."
 
 ;; Special overlay -------------------------------------------------------------
 (defun ov-placeholder (ov-or-ovs)
-  "Set a placeholder feature for OV-OR-OVS or a list of overlays.
+  "Set a placeholder feature for an overlay or a list of overlays.
 
-Each overlay deletes its string and overlay, when it is modified."
+Each overlay deletes its string and overlay, when it is modified.
+
+OV-OR-OVS can be an overlay or list of overlay."
   (ov-set ov-or-ovs
           'evaporate t
           'modification-hooks '(ov--placeholder)
@@ -556,8 +558,6 @@ Each overlay deletes its string and overlay, when it is modified."
           'insert-behind-hooks '(ov--placeholder)))
 
 (defun ov--placeholder (ov after beg end &optional length)
-  "Modification hooks for placeholder overlay.
-Called this function with 5 arguments; OV, AFTER, BEG, END, LENGTH."
   (let ((inhibit-modification-hooks t))
     (when (not (or undo-in-progress
                    (eq this-command 'undo)
@@ -641,11 +641,8 @@ Default background color is used when BASE-COLOR is nil."
 Each background color is randomly determined based on BASE-COLOR
 or the default background color.
 
-Optional MATCH-END is used search.
-
 If REGEXP-OR-LIST is regexp
    Set overlays between matches of a regexp.
-
 If REGEXP-OR-LIST is list
    Set overlays between point pairs in a list.
    i.e. (ov-smear '((1 . 30) (30 . 90)))"
