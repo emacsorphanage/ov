@@ -1,4 +1,4 @@
-;;; ov.el --- Overlay library for Emacs Lisp -*- coding: utf-8; lexical-binding: t -*-
+;;; ov.el --- Overlay library for Emacs Lisp -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014 by Shingo Fukuyama
 
@@ -6,7 +6,7 @@
 ;; Author: Shingo Fukuyama - http://fukuyama.co
 ;; URL: https://github.com/ShingoFukuyama/ov.el
 ;; Created: Mar 20 2014
-;; Keywords: overlay
+;; Keywords: convenience overlay
 ;; Package-Requires: ((emacs "24.3"))
 
 ;; This program is free software; you can redistribute it and/or
@@ -476,8 +476,7 @@ The arguments are the same as for `ov-prev'."
   "Set KEYBINDS to an overlay or a list of overlays.
 
 If OV-OR-OVS-OR-ID is a symbol, the KEYBINDS will be enabled for
-the entire buffer and the property represented by the symbol to
-`t'.
+the entire buffer and the property represented by the symbol to t.
 
 The overlay is expanded if new inputs are inserted at the
 beginning or end of the buffer."
@@ -514,7 +513,9 @@ If INSERT-IN-FRONT is non-nil, inserting in front of each overlay is prevented.
 
 If INSERT-BEHIND is non-nil, inserting behind of each overlay is prevented.
 
-Note that it allows modifications from out of range of a read-only overlay."
+Note that it allows modifications from out of range of a read-only overlay.
+
+OV-OR-OVS can be an overlay or list of overlay."
   (cond ((not (and insert-in-front insert-behind))
          (ov-set ov-or-ovs
                  'modification-hooks '(ov--read-only)))
@@ -547,7 +548,9 @@ Note that it allows modifications from out of range of a read-only overlay."
 (defun ov-placeholder (ov-or-ovs)
   "Set a placeholder feature for an overlay or a list of overlays.
 
-Each overlay deletes its string and overlay, when it is modified."
+Each overlay deletes its string and overlay, when it is modified.
+
+OV-OR-OVS can be an overlay or list of overlay."
   (ov-set ov-or-ovs
           'evaporate t
           'modification-hooks '(ov--placeholder)
@@ -568,7 +571,7 @@ Each overlay deletes its string and overlay, when it is modified."
 
 ;; Smear background ------------------------------------------------------------
 (defun ov--parse-hex-color (hex)
-  "Convert a hex color code to a RGB list.
+  "Convert a HEX color code to a RGB list.
 i.e.
 #99ccff => (153 204 255)
 #33a    => (51 51 170)"
@@ -636,13 +639,13 @@ Default background color is used when BASE-COLOR is nil."
 (defun ov-smear (regexp-or-list &optional match-end base-color color-range)
   "Set background color overlays to the current buffer.
 Each background color is randomly determined based on BASE-COLOR
-or  the default background color.
+or the default background color.
 
 If REGEXP-OR-LIST is regexp
    Set overlays between matches of a regexp.
 If REGEXP-OR-LIST is list
    Set overlays between point pairs in a list.
-   i.e. (ov-smear '((1 . 30) (30 . 90))) "
+   i.e. (ov-smear '((1 . 30) (30 . 90)))"
   (interactive "sSplitter: ")
   (ov-clear 'ov-smear)
   (let (points area length (counter 0) ov-list)
