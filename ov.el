@@ -264,6 +264,16 @@ Finally, the variable is set to nil."
   "Return the length of the region spanned by OVERLAY."
   (- (ov-end overlay) (ov-beg overlay)))
 
+(defun ov-string (&optional overlay)
+  "Return the buffer string spanned by OVERLAY.
+
+If OVERLAY is nil, default to the overlay at point.
+
+If no overlay is found, return nil."
+  (setq overlay (or overlay (ov-at)))
+  (when (overlayp overlay)
+    (buffer-substring-no-properties (ov-beg overlay) (ov-end overlay))))
+
 (defun ov-spec (ov-or-ovs)
   "Make an overlay specification list.
 This is of the form:
