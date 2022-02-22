@@ -257,7 +257,7 @@
   (should (ov? (car ov1)))
   (should (eq 8 (length (ov-all))))
   (ov-goto-next)
-  (execute-kbd-macro (read-kbd-macro "C-n"))
+  (execute-kbd-macro "C-n")
   (should (eq 0 (length (ov-all)))))
 
 (ert-deftest ov-test/ov-keymap2 ()
@@ -270,7 +270,7 @@
   (should (ov? ov1))
   (should (eq (point-at-bol) (ov-beg ov1)))
   (should (eq (point-at-eol) (1- (ov-end ov1))))
-  (execute-kbd-macro (read-kbd-macro "C-p"))
+  (execute-kbd-macro "C-p")
   (should (eq 0 (length (ov-all)))))
 
 (ert-deftest ov-test/ov-keymap3 ()
@@ -281,7 +281,7 @@
   (should (eq (point-min) (ov-beg ov1)))
   (should (eq (point-max) (ov-end ov1)))
   (should (ov? (ov-at)))
-  (execute-kbd-macro (read-kbd-macro "C-p"))
+  (execute-kbd-macro "C-p")
   (should-not (ov? (ov-at))))
 
 (ert-deftest ov-test/ov-read-only1 ()
