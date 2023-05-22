@@ -345,6 +345,20 @@
 
 ;; (ov-smear "\n\n" t)
 
+(ert-deftest ov-test/ov-string-at-point ()
+  (ov-test-insert-dummy-text)
+  (ov-regexp "the")
+  (goto-char (ov-beg (ov-next)))
+  (should (equal (ov-string) "the")))
+
+(ert-deftest ov-test/ov-string-with-arg ()
+  (ov-test-insert-dummy-text)
+  (setq ov (car (ov-regexp "the")))
+  (should (equal (ov-string ov) "the")))
+
+(ert-deftest ov-test/ov-string-at-point-no-ov ()
+  (ov-test-insert-dummy-text)
+  (should (not (ov-string))))
 
 (provide 'ov-test)
 ;;; ov-test.el ends here
