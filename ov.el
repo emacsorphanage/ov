@@ -103,20 +103,21 @@ If BEG and END are numbers, they specify the bounds of the search."
                               ov-or-ovs)))
       ov-or-ovs)))
 
-(defun ov-regexp (regexp &optional beg end)
+(defun ov-regexp (regexp &optional beg end subexp)
   "Make overlays spanning the regions that match REGEXP.
 
-If BEG and END are numbers, they specify the bounds of the search."
+If BEG and END are numbers, they specify the bounds of the search.
+SUBEXP is the number of the subexpression."
   (save-excursion
     (goto-char (or beg (point-min)))
-    (let (ov-or-ovs finish)
+    (let (ov-or-ovs finish (submatch (or subexp 0)))
       (ov-recenter (point-max))
       (while (and (not finish) (re-search-forward regexp end t))
-        (setq ov-or-ovs (cons (ov-make (match-beginning 0)
-                                       (match-end 0)
+        (setq ov-or-ovs (cons (ov-make (match-beginning submatch)
+                                       (match-end submatch)
                                        nil (not ov-sticky-front) ov-sticky-rear)
                               ov-or-ovs))
-        (when (= (match-beginning 0) (match-end 0))
+        (when (= (match-beginning submatch) (match-end submatch))
           (if (eobp)
               (setq finish t)
             (forward-char 1))))
